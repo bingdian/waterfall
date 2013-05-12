@@ -79,8 +79,8 @@
         
 
         /**
-		 * 获取可显示瀑布流列数
-		 */
+         * 获取可显示瀑布流列数
+         */
         _getColumns : function() {
             var options = this.options,
                 $container = options.fitWidth ?  this.$element.parent() : this.$element,
@@ -95,8 +95,8 @@
         
         
         /**
-		 * 设置瀑布流列数
-		 */
+         * 设置瀑布流列数
+         */
         _setColumns: function() {
             this.cols = this._getColumns();
         },
@@ -115,27 +115,27 @@
         
         
         /*
-		 * 重置瀑布流各列高度数组
-		 */
-		_resetColumnsHeightArray: function() {
+         * 重置瀑布流各列高度数组
+         */
+        _resetColumnsHeightArray: function() {
             var cols = this.cols;
             
-			this.colHeightArray.length = cols;
-			
-			for (var i = 0; i < cols; i++) {
-				this.colHeightArray[i] = 0;
-			}
-		},
+            this.colHeightArray.length = cols;
+            
+            for (var i = 0; i < cols; i++) {
+                this.colHeightArray[i] = 0;
+            }
+        },
         
         /**
-		 * 请求api数据
-		 */
-		_requestData: function(callback) {
-			var self = this,
+         * 请求api数据
+         */
+        _requestData: function(callback) {
+            var self = this,
                 options = this.options,
                 api = options.api;
-				timestamp = new Date().getTime(),
-				params = options.params;
+                timestamp = new Date().getTime(),
+                params = options.params;
                 
             console.log('开始请求数据...');
             
@@ -143,33 +143,33 @@
             params.page = this.page;
             
             // 加载数据前显示loading
-			this.$loading.show(); 
-			
-			$.ajax({
-				url: api,
-				data: params,
-				dataType: 'json',
-				//async: false, //同步请求,防止页面加载顺序错乱
-				success: function(data) {
+            this.$loading.show(); 
+            
+            $.ajax({
+                url: api,
+                data: params,
+                dataType: 'json',
+                //async: false, //同步请求,防止页面加载顺序错乱
+                success: function(data) {
                     /* 模拟数据加载延迟
                     setTimeout(function() {
                         self._handleResponse(data, callback);
                     }, 2000);*/
                     self._handleResponse(data, callback);
-				},
-				error: function() {
+                },
+                error: function() {
                     logError('数据加载失败，请稍后再试。');
-				}
-			});
-		},
+                }
+            });
+        },
         
         
         /**
-		 * 处理返回的请求数据
-		 * @param {Object} data
-		 * @param {Function} callback
-		 */
-		_handleResponse: function(data, callback) {
+         * 处理返回的请求数据
+         * @param {Object} data
+         * @param {Function} callback
+         */
+        _handleResponse: function(data, callback) {
             var template = this.template,
                 content = this.template(data),
                 $content = $('<div>' + content + '</div>'),
@@ -196,16 +196,16 @@
             var self = this,
                 $item = $(item),
                 options = this.options,
-				colWidth = options.colWidth,
+                colWidth = options.colWidth,
                 gutterWidth = options.gutterWidth,
                 gutterHeight = options.gutterHeight,
-				colHeightArray = this.colHeightArray,
-				len = colHeightArray.length,
-				minColHeight = Math.min.apply({}, colHeightArray),		//当前所有列中最小高度
-				minColIndex = $.inArray(minColHeight, colHeightArray);		//当前所有列中最小高度下标,
-				x = (colWidth + gutterWidth) * minColIndex,
-				y = minColHeight;
-			
+                colHeightArray = this.colHeightArray,
+                len = colHeightArray.length,
+                minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
+                minColIndex = $.inArray(minColHeight, colHeightArray);        //当前所有列中最小高度下标,
+                x = (colWidth + gutterWidth) * minColIndex,
+                y = minColHeight;
+            
             //console.log(colHeightArray);console.log(x);
             
             $item.css({
@@ -263,9 +263,9 @@
             var options = this.options,
                 maxPage = options.maxPage,
                 curPage = this.page,
-				diff = options.diff,	//为正时可以看到瀑布流底部
-				loadLine = $(window).scrollTop() + $(window).height() - this.$element.offset().top  - diff, //预加载线
-				minColHeight = Math.min.apply({}, this.colHeightArray);
+                diff = options.diff,    //为正时可以看到瀑布流底部
+                loadLine = $(window).scrollTop() + $(window).height() - this.$element.offset().top  - diff, //预加载线
+                minColHeight = Math.min.apply({}, this.colHeightArray);
             
             if ( loadLine >  minColHeight) {
                 this._requestData();
@@ -278,15 +278,15 @@
          */
         _doScroll: function() {
             var _self = this,
-				timer;
-			
-			$(window).bind('scroll', function() {
-				clearTimeout(timer);
-				timer = setTimeout(function() {
+                timer;
+            
+            $(window).bind('scroll', function() {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
                     console.log('scroll ...');
-					_self._scroll();
-				}, 100);
-			});
+                    _self._scroll();
+                }, 100);
+            });
         },
         
         
@@ -295,19 +295,19 @@
          */
         _resize: function() {
             var cols = this.cols,
-				newCols = this._getColumns(), //resize后获取页面可以显示列数
-				i = 0,
-				len;
-			
-            console.log('resize之前列数:' + cols);	
-			console.log('resize之后列数:' + newCols);
+                newCols = this._getColumns(), //resize后获取页面可以显示列数
+                i = 0,
+                len;
             
-			//列数没变化不调整
-			//页面列数有变化时resize
-			if ( newCols !== cols) {
+            console.log('resize之前列数:' + cols);    
+            console.log('resize之后列数:' + newCols);
+            
+            //列数没变化不调整
+            //页面列数有变化时resize
+            if ( newCols !== cols) {
                 this.cols = newCols; //更新列数
                 this._reLayout(); //重排数据
-			}
+            }
         },
         
         
@@ -316,14 +316,14 @@
          */
         _doResize: function() {
             var self = this,
-				timer;
+                timer;
 
-			$(window).bind('resize', function() {
-				clearTimeout(timer);
-				timer = setTimeout(function() {
-					self._resize();
-				}, 100); 
-			});
+            $(window).bind('resize', function() {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    self._resize();
+                }, 100); 
+            });
         },
         
 
