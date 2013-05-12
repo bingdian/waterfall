@@ -105,7 +105,7 @@
          * 获取元素中的数据块
          */
         _getItems: function( $content ) {
-            var $items = $content.find('.' + this.options.itemCls).css({
+            var $items = $content.filter('.' + this.options.itemCls).css({
                 'position': 'absolute'
             });
             
@@ -170,8 +170,8 @@
          */
         _handleResponse: function(data, callback) {
             var template = this.template,
-                content = this.template(data),
-                $content = $('<div>' + content + '</div>'),
+                content = $.trim(this.template(data)), //$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+                $content = $(content),
                 $newItems = this._getItems($content);
             
             //处理后html插入瀑布流 
