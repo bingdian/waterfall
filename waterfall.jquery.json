@@ -1,0 +1,27 @@
+{
+  "name": "waterfall",
+  "title": "Waterfall",
+  "description": "瀑布布局组件",
+  "version": "0.1.0",
+  "homepage": "http://wlog.cn/athena/waterfall/",
+  "author": {
+    "name": "bingdian",
+    "email": "imbingdian@gmail.com",
+    "url": "http://wlog.cn"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bingdian/waterfall.git"
+  },
+  "bugs": "https://github.com/bingdian/waterfall/issues",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://wlog.cn/athena/waterfall//blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "*"
+  },
+  "keywords": []
+}
