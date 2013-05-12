@@ -38,7 +38,6 @@
         },
         
         // helper function for logging errors
-        // $.error breaks jQuery chaining
         logError = function( message ) {
             if ( window.console ) {
                 window.console.error( message );
