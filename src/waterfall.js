@@ -378,6 +378,7 @@
 }( jQuery, window, document ));
 /*
  * To do
+ * 改进瀑布流数据块算法
  * 瀑布流animate
  * 插入数据时效果append effect
  * 测试ajax数据顺序
