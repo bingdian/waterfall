@@ -28,7 +28,11 @@
             },
             
             resizable: true, //缩放时是否触发数据重排
-            animated: false, //重排数据是否显示动画
+            
+            isAnimated: true, //重排数据是否显示动画
+            animationOptions: {
+                
+            },
             
             autoLoad: true, //
             loading: 'loading...',  //数据加载中内容
@@ -52,6 +56,7 @@
         this.options = $.extend( {}, defaults, options);
         this.colHeightArray = []; 
         this.loaded; //记录ajax请求数据是否加载完成
+        this.styleQueue = [];
         this.page = 1;
         
         this._init();
@@ -136,8 +141,6 @@
                 timestamp = new Date().getTime(),
                 params = options.params;
                 
-            console.log('开始请求数据...');
-            
             // page
             params.page = this.page;
             
@@ -150,11 +153,11 @@
                 dataType: 'json',
                 //async: false, //同步请求,防止页面加载顺序错乱
                 success: function(data) {
-                    /* 模拟数据加载延迟
+                    // 模拟数据加载延迟
                     setTimeout(function() {
                         self._handleResponse(data, callback);
-                    }, 2000);*/
-                    self._handleResponse(data, callback);
+                    }, 2000);/*
+                    self._handleResponse(data, callback);*/
                 },
                 error: function() {
                     logError('数据加载失败，请稍后再试。');
@@ -173,6 +176,8 @@
                 content = $.trim(this.template(data)), //$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
                 $newItems = this._getItems($content);
+                
+            console.log($newItems);
             
             //处理后html插入瀑布流 
             this.$container.append($content);
@@ -187,9 +192,51 @@
             this.page += 1;
         },
         
+
         
         /*
-         * 设置数据块的位置
+         * 排列数据块
+         */
+        layout: function($items, callback) {
+            var options = this.options,
+                styleFn = !this.isLaidOut ? 'css' : (
+                    this.options.isAnimated ? 'animate' : 'css'
+                ), // 数据块动画效果
+                animationOptions = options.animationOptions,
+                obj;
+                
+            
+
+            // 设置数据块的位置样式
+            for (var i = 0, len = $items.length; i < len; i++) {
+                this._placeItems( $items[i] );
+            }
+
+            // 应用数据块样式
+            for (i=0, len = this.styleQueue.length; i < len; i++) {
+                obj = this.styleQueue[i];
+                obj.$el[ styleFn ]( obj.style, animationOptions );
+                console.log(obj.style, animationOptions);
+            }
+            
+            // 瀑布流数据块排列完成设置$container高度
+            this.$container.height(Math.max.apply({}, this.colHeightArray));
+            
+            //清除队列
+            this.styleQueue = [];
+
+            // callback
+            if ( callback ) {
+                callback.call( $items );
+            }
+            
+            this.isLaidOut = true;
+        },
+        
+        
+        
+        /*
+         * 设置数据块的位置样式
          */
         _placeItems: function( item ) {
             var self = this,
@@ -203,14 +250,14 @@
                 minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
                 minColIndex = $.inArray(minColHeight, colHeightArray);        //当前所有列中最小高度下标,
                 x = (colWidth + gutterWidth) * minColIndex,
-                y = minColHeight;
+                y = minColHeight,
+                position = {
+                    left: x,
+                    top: y
+                };
             
-            //console.log(colHeightArray);console.log(x);
-            
-            $item.css({
-                left: x,
-                top: y
-            });
+            //插入动画效果队列
+            this.styleQueue.push({ $el: $item, style: position });
             
             //更新colHeightArray高度
             colHeightArray[minColIndex] += $item.outerHeight() + gutterHeight;
@@ -220,34 +267,10 @@
         },
         
         /*
-         * 排列数据块
-         */
-        layout: function($items, callback) {
-            
-            console.log('瀑布流数据开始排列 ...')
-            
-            for (var i = 0, len = $items.length; i < len; i++) {
-                this._placeItems( $items[i] );
-            }
-            
-            // 瀑布流数据块排列完成设置$container高度
-            this.$container.height(Math.max.apply({}, this.colHeightArray));
-
-            console.log('瀑布流数据排列完成 ... ');
-            
-            if ( callback ) {
-                callback.call( $items );
-            }
-        },
-        
-        
-        /*
          * 全部重排数据块
          */
         _reLayout: function( callback ) {
             var $items = this.$element.find('.' + this.options.itemCls);
-            
-            console.log('重排已有数据...');
             
             this._resetColumnsHeightArray(); //重置高度数组
             
@@ -335,8 +358,6 @@
                 api = options.api,
                 tpl = options.tpl;
                 
-            console.log('瀑布流初始化 ...');
-            
             if ( !api ) {// 没有提供api
                 logError('Invalid api');
                 return;
@@ -355,12 +376,15 @@
             this._resetColumnsHeightArray();
             this._reLayout( callback );
             
+            // 绑定滚动事件
             this._doScroll();
             
+            // 绑定resize事件
             if ( options.resizable ) {
                 this._doResize();
             }
             
+            // 请求api数据
             this._requestData();
         }
     }
@@ -379,6 +403,7 @@
  * To do
  * 改进瀑布流数据块算法
  * 瀑布流animate
+ * 优化动画效果
  * 插入数据时效果append effect
  * 测试ajax数据顺序
  * 跨域
