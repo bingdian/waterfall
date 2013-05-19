@@ -13,39 +13,52 @@
     var pluginName = 'waterfall',
         defaults = {
             itemCls: 'waterfall-item',  //瀑布流数据块class
-            prefix: 'waterfall', //
+            prefix: 'waterfall', //瀑布流元素前辍
             
             fitWidth: true, //是否自适应父元素宽度
             colWidth: 240,  //数据块每列宽度
             gutterWidth: 0, //数据块水平间距
             gutterHeight: 0, //数据块垂直间距
             minCol: 1,  //数据块最小列数
-            maxPage: 5, //最多显示多少页数据
-            diff: -100, //加载线
+            maxPage: undefined, //最多显示多少页数据,默认undefined，无限下拉
+            bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
             
             containerStyle: { //瀑布流元素样式
                 position: 'relative'
             },
             
-            resizable: true, //缩放时是否触发数据重排
-            
+            resizable: true, //缩放时是否触发数据重排?false时测试数据是否会自动加载
+            isFadeIn: true, // 新插入数据是否使用fade动画
             isAnimated: true, //重排数据是否显示动画
             animationOptions: {
-                
+            },
+            isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据 
+            
+            
+            loading: {
+                loadingMsg: 'loading...',
+                ajaxFailedMsg: 'ajax request failed, please try again later',
+                start: undefined,
+                finished: undefined
+            },  //数据加载中内容
+            
+            state: {
+                isDuringAjax: false,
+                isLaidOut: false,
+                isDestroyed: false,
+                isDone: false, 
+                curPage: 1
             },
             
-            autoLoad: true, //
-            loading: 'loading...',  //数据加载中内容
-            api: null,  //瀑布流数据api url, json数据
+            path: undefined, // 瀑布流数据分页url，可以是数组如["/page/", "/"]，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
+            dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
-            tpl: $('#waterfall-tpl').html()
-        },
-        
-        // helper function for logging errors
-        logError = function( message ) {
-            if ( window.console ) {
-                window.console.error( message );
-            }
+            
+            callbacks: {
+            },
+            tpl: $('#waterfall-tpl').html(),
+            
+            debug: true
         };
     
     /*
@@ -54,10 +67,8 @@
     function Waterfall(element, options) {
         this.$element = $(element);
         this.options = $.extend( {}, defaults, options);
-        this.colHeightArray = []; 
-        this.loaded; //记录ajax请求数据是否加载完成
-        this.styleQueue = [];
-        this.page = 1;
+        this.colHeightArray = []; // 瀑布流各列高度数组
+        this.styleQueue = []; //
         
         this._init();
     }
@@ -66,19 +77,77 @@
     Waterfall.prototype = {
         constructor: 'Waterfall',
         
+        // Console log wrapper
+        _debug: function infscr_debug() {
+			if ( true !== this.options.debug ) {
+				return;
+			}
+
+			if (typeof console !== 'undefined' && typeof console.log === 'function') {
+				// Modern browsers
+				// Single argument, which is a string
+				if ((Array.prototype.slice.call(arguments)).length === 1 && typeof Array.prototype.slice.call(arguments)[0] === 'string') {
+					console.log( (Array.prototype.slice.call(arguments)).toString() );
+				} else {
+					console.log( Array.prototype.slice.call(arguments) );
+				}
+			} else if (!Function.prototype.bind && typeof console !== 'undefined' && typeof console.log === 'object') {
+				// IE8
+				Function.prototype.call.call(console.log, console, Array.prototype.slice.call(arguments));
+			}
+        },
+        
+        
+        /*
+         * _init 初始化瀑布流
+         * @callback {Object Function } 当实例再次被触发时回调函数 -> $el.waterfall();
+         */
+        _init: function( callback ) {
+            var options = this.options,
+                path = options.path,
+                tpl = options.tpl;
+                
+            if ( !path ) { // 没有提供api
+                this._debug('Invalid path');
+                return;
+            }
+            
+            if ( !tpl ) {// 没有提供模板
+                this._debug('Template needed');
+                return;
+            }
+            
+            //template
+            this.template = Handlebars.compile(tpl);
+
+            this._setColumns();
+            this._initContainer(); 
+            this._resetColumnsHeightArray();
+            this._reLayout( callback ); // 对已有数据块重排
+            
+            
+            if ( options.isAutoPrefill ) {
+				this._prefill();
+			}
+            
+            //绑定事件
+            this._doResize();
+            this._doScroll();
+        },
+        
         /*
          * 初始化瀑布流容器
          */
         _initContainer: function() {
             var options = this.options,
-                prefix = options.prefix,
-                loading = options.loading;
+                prefix = options.prefix;
                 
-            this.$element.css(this.options.containerStyle).addClass(prefix);
-            this.$element.append('<div class="' + prefix + '-container"></div><div class="' + prefix + '-loading">' +loading+ '</div>');
+            //如果没有数据再插入div
+            this.$element.css(this.options.containerStyle).addClass(prefix + '-container');
+            this.$element.after('<div id="' + prefix + '-loading">' +options.loading.loadingMsg+ '</div>');
             
-            this.$container = this.$element.find('.' + prefix + '-container');
-            this.$loading = this.$element.find('.' + prefix + '-loading');
+            this.$container = this.$element;
+            this.$loading = this.$element.find('#' + prefix + '-loading');
         },
         
 
@@ -131,82 +200,19 @@
             }
         },
         
-        /**
-         * 请求api数据
-         */
-        _requestData: function(callback) {
-            var self = this,
-                options = this.options,
-                api = options.api;
-                timestamp = new Date().getTime(),
-                params = options.params;
-                
-            // page
-            params.page = this.page;
-            
-            // 加载数据前显示loading
-            this.$loading.show(); 
-            
-            $.ajax({
-                url: api,
-                data: params,
-                dataType: 'json',
-                //async: false, //同步请求,防止页面加载顺序错乱
-                success: function(data) {
-                    // 模拟数据加载延迟
-                    setTimeout(function() {
-                        self._handleResponse(data, callback);
-                    }, 2000);/*
-                    self._handleResponse(data, callback);*/
-                },
-                error: function() {
-                    logError('数据加载失败，请稍后再试。');
-                }
-            });
-        },
-        
-        
-        /**
-         * 处理返回的请求数据
-         * @param {Object} data
-         * @param {Function} callback
-         */
-        _handleResponse: function(data, callback) {
-            var template = this.template,
-                content = $.trim(this.template(data)), //$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
-                $content = $(content),
-                $newItems = this._getItems($content);
-                
-            console.log($newItems);
-            
-            //处理后html插入瀑布流 
-            this.$container.append($content);
-            
-            //排列瀑布流数据
-            this.layout($newItems, callback);
-            
-            //隐藏loading
-            this.$loading.hide();
-            
-            //更新瀑布流page
-            this.page += 1;
-        },
-        
-
-        
         /*
          * 排列数据块
          */
         layout: function($items, callback) {
             var options = this.options,
+            /*
                 styleFn = !this.isLaidOut ? 'css' : (
                     this.options.isAnimated ? 'animate' : 'css'
-                ), // 数据块动画效果
+                ), // 数据块动画效果*/
+                styleFn = this.options.isAnimated ? 'animate' : 'css', // 数据块动画效果
                 animationOptions = options.animationOptions,
                 obj;
-                
             
-
             // 设置数据块的位置样式
             for (var i = 0, len = $items.length; i < len; i++) {
                 this._placeItems( $items[i] );
@@ -216,23 +222,25 @@
             for (i=0, len = this.styleQueue.length; i < len; i++) {
                 obj = this.styleQueue[i];
                 obj.$el[ styleFn ]( obj.style, animationOptions );
-                console.log(obj.style, animationOptions);
             }
             
             // 瀑布流数据块排列完成设置$container高度
-            this.$container.height(Math.max.apply({}, this.colHeightArray));
+            this.$element.height(Math.max.apply({}, this.colHeightArray));
             
             //清除队列
             this.styleQueue = [];
-
+            
+            //
+            this.options.state.isLaidOut = true;
+            
+            // 加载完不够一屏再次检测
+            this._prefill();
+            
             // callback
             if ( callback ) {
                 callback.call( $items );
             }
-            
-            this.isLaidOut = true;
         },
-        
         
         
         /*
@@ -276,37 +284,177 @@
             
             this.layout( $items, callback )
         },
-
-
-        /*
-         * scroll
+        
+        _startLoading: function() {
+        },
+        
+        _endLoading: function() {
+        },
+        
+        
+        /**
+         * 请求api数据
          */
-        _scroll: function() {
-            var options = this.options,
+        _requestData: function(callback) {
+            var self = this,
+                options = this.options,
                 maxPage = options.maxPage,
-                curPage = this.page,
+                curPage = options.state.curPage++, // increment
+                path = options.path,
+                dataType = options.dataType,
+                timestamp = new Date().getTime(),
+                params = options.params,
+                pageurl;
+
+            // 超过最大页数 return
+            if ( maxPage !== undefined && curPage > maxPage ){
+                options.state.isBeyondMaxPage = true;
+                this.destroy();
+                return;
+            }
+            
+            // 获取数据url
+            pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
+			this._debug('heading into ajax', pageurl);
+            
+            // 加载数据前显示loading
+            this.$loading.show();
+            
+            // 记录ajax请求状态
+            this.options.state.isDuringAjax = true;
+            
+            //请求数据
+            $.ajax({
+                url: pageurl,
+                data: params,
+                dataType: dataType,
+                success: function(data, textStatus, jqXHR) {
+                    condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
+                    
+                    console.log('ajax load page ' + curPage);
+                    //console.log(textStatus);
+                    //console.log(jqXHR);
+                    //console.log(condition);
+                    
+                    if (condition) {
+                        // 模拟数据加载延迟
+                        setTimeout(function() {
+                            self._handleResponse(data, callback);
+                        }, 1000);
+                        /*
+                        self._handleResponse(data, callback);*/
+                    } else {
+                        self._responeseError('end');
+                    }
+                    
+                    self.options.state.isLaidOut = false;
+                    self.options.state.isDuringAjax = false;
+                },
+                error: function() {
+                    self._debug('ajax request failed.');
+                    self._responeseError('failed');
+                }
+            });
+        },
+        
+        
+        /**
+         * 处理返回的请求数据
+         * @param {Object} data
+         * @param {Function} callback
+         */
+        _handleResponse: function(data, callback) {
+            var template = this.template,
+                content = $.trim(this.template(data)), //$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+                $content = $(content),
+                $newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
+
+            //处理后html插入瀑布流 
+            this.$element.append($content);
+            
+            //排列瀑布流数据
+            this.layout($newItems, callback);
+            
+            //隐藏loading
+            this.$loading.hide();
+        },
+        
+        /*
+         * 请求数据失败
+         * _responeseError
+         */
+        _responeseError: function(xhr) {
+            var options = this.options;
+
+            if (xhr !== 'destroy' && xhr !== 'end' && xhr !== 'failed' ) {
+                xhr = 'unknown';
+            }
+            
+            this._debug('Error', xhr);
+            
+            if (xhr === 'end' || options.state.isBeyondMaxPage) {
+                
+            }
+            
+            if ( xhr === 'failed' ) {
+                this.$loading.html(options.loading.ajaxFailed);
+            }
+            
+            
+        },
+        
+        
+        _nearbottom: function() {
+            var options = this.options,
+                minColHeight = Math.min.apply({}, this.colHeightArray),
+                distanceFromWindowBottomToMinColBottom = $(window).scrollTop() + $(window).height() - this.$element.offset().top - minColHeight; // 窗口底部到瀑布流最小高度列的距离
+                
+            this._debug('math:', distanceFromWindowBottomToMinColBottom);
+
+            // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
+            return ( distanceFromWindowBottomToMinColBottom > options.bufferPixel );
+
+        },
+        
+        /*
+         * _prefill
+         */
+        _prefill: function() {
+            var options = this.options,
+                state = options.state,
                 diff = options.diff,    //为正时可以看到瀑布流底部
-                loadLine = $(window).scrollTop() + $(window).height() - this.$element.offset().top  - diff, //预加载线
+                loadLine = $(window).scrollTop() + $(window).height() - this.$element.offset().top  - options.bufferPixel, //预加载线
                 minColHeight = Math.min.apply({}, this.colHeightArray);
             
-            if ( loadLine >  minColHeight) {
-                this._requestData();
-            }
+            console.log(state.isLaidOut);
+            
+            // !state.isLaidOut 数据还没有排列完成 return
+            // ajax数据正在请求还没有完成 return
+            // 
+            if ( !state.isLaidOut || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
+				return;
+			}
+            
+            if ( !this._nearbottom() ) {
+				return;
+			}
+            
+            this._requestData();
         },
         
         
         /*
-         * 页面滚动事件
+         * 绑定scroll事件
          */
         _doScroll: function() {
-            var _self = this,
+            var self = this,
                 timer;
             
             $(window).bind('scroll', function() {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    console.log('scroll ...');
-                    _self._scroll();
+                    self._debug('event', 'scroll ...');
+                    self._prefill();
                 }, 100);
             });
         },
@@ -334,7 +482,7 @@
         
         
         /*
-         * 
+         * 绑定resize事件 
          */
         _doResize: function() {
             var self = this,
@@ -343,50 +491,12 @@
             $(window).bind('resize', function() {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
+                    self._debug('event', 'resize ...');
                     self._resize();
                 }, 100); 
             });
-        },
-        
-
-        /*
-         * _init 初始化瀑布流
-         * @callback {Object Function } 当实例再次被触发时回调函数 -> $el.waterfall();
-         */
-        _init: function( callback ) {
-            var options = this.options,
-                api = options.api,
-                tpl = options.tpl;
-                
-            if ( !api ) {// 没有提供api
-                logError('Invalid api');
-                return;
-            }
-            
-            if ( !tpl ) {// 没有提供模板
-                logError('Template needed');
-                return;
-            }
-            
-            //template
-            this.template = Handlebars.compile(tpl);
-
-            this._setColumns();
-            this._initContainer();
-            this._resetColumnsHeightArray();
-            this._reLayout( callback );
-            
-            // 绑定滚动事件
-            this._doScroll();
-            
-            // 绑定resize事件
-            if ( options.resizable ) {
-                this._doResize();
-            }
-            
-            // 请求api数据
-            this._requestData();
         }
+        
     }
     
     
@@ -401,9 +511,10 @@
 }( jQuery, window, document ));
 /*
  * To do
- * 改进瀑布流数据块算法
- * 瀑布流animate
+ * 改进瀑布流数据块算法 - ok
+ * 瀑布流animate - ok
  * 优化动画效果
+ * page path 方法
  * 插入数据时效果append effect
  * 测试ajax数据顺序
  * 跨域
