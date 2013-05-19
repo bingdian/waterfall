@@ -288,6 +288,7 @@
          * 设置数据块的位置样式
          */
         _placeItems: function( item, fixMarginLeft ) {
+            /*
             var self = this,
                 $item = $(item),
                 options = this.options,
@@ -303,16 +304,46 @@
                 position = {
                     left: x,
                     top: y
-                };
+                };*/
+            
+            var self = this,
+                $item = $(item),
+                options = this.options,
+                colWidth = options.colWidth,
+                gutterWidth = options.gutterWidth,
+                gutterHeight = options.gutterHeight,
+                colHeightArray = this.colHeightArray,
+                len = colHeightArray.length,
+                minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
+                minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
+                colIndex,
+                position;
+                
+                
+             
+            // 固定左边或右边
+            if ( $item.hasClass(options.prefix + '-item-fixed-left')) {
+                colIndex = 0;
+            } else if ( $item.hasClass(options.prefix + '-item-fixed-right') ) {
+                colIndex = len > 1 ? ( len - 1) : 0;
+            } else {
+                colIndex = minColIndex;
+            }
+            
+            position = {
+                left: (colWidth + gutterWidth) * colIndex  + fixMarginLeft,
+                top: minColHeight  
+            }
+
             
             //插入动画效果队列
             this.styleQueue.push({ $el: $item, style: position });
             
             //更新colHeightArray高度
-            colHeightArray[minColIndex] += $item.outerHeight() + gutterHeight;
+            colHeightArray[colIndex] += $item.outerHeight() + gutterHeight;
             
             //item添加class
-            $item.addClass('col-' + minColIndex);
+            $item.addClass('col-' + colIndex);
         },
         
         /*
@@ -555,15 +586,15 @@
 /*
  * To do
  * 改进瀑布流数据块算法 
- * 瀑布流animate - ok
- * fix横向滚动条 - ok
+ * 瀑布流animate - done
+ * fix横向滚动条 - done
  * 优化动画效果
- * page path 方法 - ok
+ * page path 方法 - done
  * 插入数据时效果append effect 
  * 测试ajax数据顺序
  * 跨域 
  * 增加mustache有等模板支持 
  * 增加公用方法
- * 数据居左、中、右 - ok
+ * 数据居左、中、右 - done
  * 数据块固定位置如居中，居左，在固定列等 
  */
