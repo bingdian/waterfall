@@ -1,0 +1,101 @@
+a:link, a:visited {
+    color: #333;
+    text-decoration: none;
+}
+a:hover {
+    color: #c30;
+    text-decoration: none;
+}
+
+/*
+ * header
+ */
+#header {
+    position: relative;
+    z-index: 99997;
+    height: 38px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0dede;
+    background-color: #f7f7f7;
+    background: linear-gradient(#fff, #f7f6f5);
+    background: -moz-linear-gradient(#fff, #f7f6f5);
+    background: -o-linear-gradient(#fff, #f7f6f5);
+    background: -webkit-linear-gradient(#fff, #f7f6f5);
+    box-shadow: 0 -1px 0 #fefcfc inset,0 0 4px rgba(0,0,0,.15);
+    -moz-shadow: 0 -1px 0 #fefcfc inset,0 0 4px rgba(0,0,0,.15);
+    -webkit-shadow: 0 -1px 0 #fefcfc inset,0 0 4px rgba(0,0,0,.15);
+}
+#header h1 {
+    font-size: 16px;
+    line-height: 38px;
+    margin: 0;
+}
+
+/*
+ * waterfall
+ */
+.item {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: 192px;
+    padding: 15px;
+    line-height: 1.5;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(34, 25, 25, .4);
+    -moz-box-shadow: 0 1px 3px rgba(34, 25, 25, .4);
+    -webkit-box-shadow: 0 1px 3px rgba(34, 25, 25, .4);
+    filter: progid:DXImageTransform.Microsoft.Shadow(color = #adacac, direction = 135, strength = 2);
+}
+.item img {
+    display: block;
+}
+
+.item:hover {
+    box-shadow: 0 1px 5px rgba(34, 25, 25, .8);
+    -moz-box-shadow: 0 1px 5px rgba(34, 25, 25, .8);
+    -webkit-box-shadow: 0 1px 5px rgba(34, 25, 25, .8);
+    filter: progid:DXImageTransform.Microsoft.Shadow(color = #979797, direction = 135, strength = 3);
+}
+
+
+
+/*
+ * page-navigation
+ */
+#page-navigation {
+	text-align: center;
+	padding: 20px 0 50px 0;
+    display: none;
+}
+#page-navigation a {
+	width:32px;
+	height: 32px;
+	line-height: 32px;
+	display: inline-block;
+	border: 1px #e4e4e4 solid;
+	text-decoration: none;
+}
+#page-navigation .page-navigation-prev, #page-navigation .page-navigation-next {
+	display: inline-block;
+	height: 32px;
+	line-height: 32px;
+	width: 80px !important;
+}
+#page-navigation a:hover {
+	border: 1px #c30 solid;
+	background: #c30;
+	color: #fff;
+}
+#page-navigation a:active {
+}
+#page-navigation a.cur {
+	border: 1px #c30 solid;
+	background: #c30;
+	color: #fff;
+}
+#page-navigation span.disabled {
+	color: #ccc;
+	border: 1px #e4e4e4 solid;
+}
+
