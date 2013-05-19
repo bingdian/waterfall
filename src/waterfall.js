@@ -46,7 +46,7 @@
             
             state: {
                 isDuringAjax: false,
-                isDuringLayout: false,
+                isProcessingData: false, //处理数据状态，从发送ajax请求开始到瀑布流数据排列结束
                 isDestroyed: false,
                 isDone: false, 
                 curPage: 1
@@ -60,10 +60,6 @@
                     template = Handlebars.compile(tpl);
                     
                 return template(data);
-            },
-            
-            callbacks: {
-                
             },
             
             debug: true
@@ -163,7 +159,7 @@
 			}
 
             //绑定事件
-            this._doResize();
+            //this._doResize();
             this._doScroll();
         },
         
@@ -246,8 +242,6 @@
                 fixMarginLeft,
                 obj;
             
-            this.options.state.isDuringLayout = true;
-            
             //计算item的left margin
             if ( align === 'center' ) {
                 fixMarginLeft = (this.$container.width() - (colWidth + gutterWidth) * len) /2;
@@ -256,7 +250,7 @@
             } else if ( align === 'right' ) {
                 fixMarginLeft = this.$container.width() - (colWidth + gutterWidth) * len;
             }
-            console.log(this.$container.width());
+            
             
             // 设置数据块的位置样式
             for (var i = 0, len = $items.length; i < len; i++) {
@@ -277,10 +271,10 @@
             
             
             // 更新排列完成状态
-            this.options.state.isDuringLayout = false;
+            this.options.state.isProcessingData = false;
             
             // 数据排玩完成不足一屏再次填充数据
-            this._fillData();
+            //this._fillData();
             
             // callback
             if ( callback ) {
@@ -293,24 +287,7 @@
          * 设置数据块的位置样式
          */
         _placeItems: function( item, fixMarginLeft ) {
-            /*
-            var self = this,
-                $item = $(item),
-                options = this.options,
-                colWidth = options.colWidth,
-                gutterWidth = options.gutterWidth,
-                gutterHeight = options.gutterHeight,
-                colHeightArray = this.colHeightArray,
-                len = colHeightArray.length,
-                minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
-                minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
-                x = (colWidth + gutterWidth) * minColIndex  + fixMarginLeft,
-                y = minColHeight,
-                position = {
-                    left: x,
-                    top: y
-                };*/
-            
+           
             var self = this,
                 $item = $(item),
                 options = this.options,
@@ -323,7 +300,6 @@
                 minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
                 colIndex,
                 position;
-                
                 
              
             // 固定左边或右边
@@ -359,7 +335,7 @@
             
             this._resetColumnsHeightArray(); //重置高度数组
             
-            this.layout( $items, callback )
+            this.layout( $items, callback );
         },
         
         /**
@@ -393,6 +369,7 @@
             
             // 记录ajax请求状态
             this.options.state.isDuringAjax = true;
+            this.options.state.isProcessingData = true;
             
             //请求数据
             $.ajax({
@@ -407,17 +384,15 @@
                     
                     if (condition) {
                         // 模拟数据加载延迟
+                        /*
                         setTimeout(function() {
                             self._handleResponse(data, callback);
-                        }, 500);
-                        // 加载数据前显示loading
-                        
-                        /*self._handleResponse(data, callback);*/
+                        }, 1500);*/
+                        self._handleResponse(data, callback);
                     } else {
                         self._responeseError('end');
                     }
                     
-                    self.options.state.isDuringLayout = false;
                     self.options.state.isDuringAjax = false;
                 },
                 error: function() {
@@ -498,12 +473,10 @@
             var options = this.options,
                 state = options.state;
             
-            console.log(state.isDuringLayout);
-            
-            // state.isDuringLayout 数据还没有排列完成 return
+            // state.isProcessingData 数据还没有处理完成 return
             // ajax数据正在请求还没有完成 return
             // 
-            if ( state.isDuringLayout || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
+            if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
 				return;
 			}
             
