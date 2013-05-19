@@ -103,7 +103,8 @@
          * @callback {Object Function } 当实例再次被触发时回调函数 -> $el.waterfall();
          */
         _init: function( callback ) {
-            var options = this.options,
+            var self = this,
+                options = this.options,
                 path = options.path,
                 tpl = options.tpl;
                 
@@ -117,6 +118,25 @@
                 return;
             }
             
+            // loading start function
+            options.loading.start = options.loading.start || function() {
+                self.$loading.show();
+                self._debug('loading', 'start');
+            };
+            
+            // loading finished function
+            options.loading.finished = options.loading.finished || function() {
+                if ( !options.state.isBeyondMaxPage ) {
+                    self.$loading.fadeOut();
+                    self._debug('loading', 'finished');
+                } else {
+                    self._debug('loading', 'isBeyondMaxPage');
+                    self.$loading.remove();
+                    // do ...
+                }
+            };
+            
+            
             //template
             this.template = Handlebars.compile(tpl);
 
@@ -126,10 +146,11 @@
             this._reLayout( callback ); // 对已有数据块重排
             
             
+            // auto prefill
             if ( options.isAutoPrefill ) {
 				this._prefill();
 			}
-            
+
             //绑定事件
             this._doResize();
             this._doScroll();
@@ -147,7 +168,7 @@
             this.$element.after('<div id="' + prefix + '-loading">' +options.loading.loadingMsg+ '</div>');
             
             this.$container = this.$element;
-            this.$loading = this.$element.find('#' + prefix + '-loading');
+            this.$loading = $('#' + prefix + '-loading');
         },
         
 
@@ -283,13 +304,6 @@
             this.layout( $items, callback )
         },
         
-        _startLoading: function() {
-        },
-        
-        _endLoading: function() {
-        },
-        
-        
         /**
          * 请求api数据
          */
@@ -307,7 +321,8 @@
             // 超过最大页数 return
             if ( maxPage !== undefined && curPage > maxPage ){
                 options.state.isBeyondMaxPage = true;
-                this.destroy();
+                options.loading.finished();
+                //this.destroy();
                 return;
             }
             
@@ -315,8 +330,6 @@
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
 			this._debug('heading into ajax', pageurl);
             
-            // 加载数据前显示loading
-            this.$loading.show();
             
             // 记录ajax请求状态
             this.options.state.isDuringAjax = true;
@@ -328,8 +341,6 @@
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
                     condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
-                    
-                    console.log('ajax load page ' + curPage);
                     //console.log(textStatus);
                     //console.log(jqXHR);
                     //console.log(condition);
@@ -338,7 +349,9 @@
                         // 模拟数据加载延迟
                         setTimeout(function() {
                             self._handleResponse(data, callback);
-                        }, 600);
+                        }, 500);
+                        // 加载数据前显示loading
+                        
                         /*self._handleResponse(data, callback);*/
                     } else {
                         self._responeseError('end');
@@ -372,8 +385,8 @@
             //排列瀑布流数据
             this.layout($newItems, callback);
             
-            //隐藏loading
-            this.$loading.hide();
+            //loading finished
+            this.options.loading.finished();
         },
         
         /*
@@ -441,6 +454,8 @@
 				return;
 			}
             
+            // loading start
+            options.loading.start();
             this._requestData();
         },
         
@@ -497,6 +512,11 @@
                     self._resize();
                 }, 100); 
             });
+        },
+        
+        
+        destroy: function() {
+
         }
         
     }
@@ -516,7 +536,7 @@
  * 改进瀑布流数据块算法 - ok
  * 瀑布流animate - ok
  * 优化动画效果
- * page path 方法
+ * page path 方法 - ok
  * 插入数据时效果append effect
  * 测试ajax数据顺序
  * 跨域
