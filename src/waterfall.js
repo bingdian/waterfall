@@ -55,10 +55,13 @@
             path: undefined, // 瀑布流数据分页url，可以是数组如["/page/", "/"]，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
             dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
-            
-            callbacks: {
+            //tpl: $('#waterfall-tpl').html(),
+            renderData: function(data) {
+                var tpl = $('#waterfall-tpl').html(),
+                    template = Handlebars.compile(tpl);
+                    
+                return template(data);
             },
-            tpl: $('#waterfall-tpl').html(),
             
             debug: true
         };
@@ -115,10 +118,11 @@
                 return;
             }
             
+            /*
             if ( !tpl ) {// 没有提供模板
                 this._debug('Template needed');
                 return;
-            }
+            }*/
             
             // loading start function
             options.loading.start = options.loading.start || function() {
@@ -141,9 +145,8 @@
                 }
             };
             
-            
             //template
-            this.template = Handlebars.compile(tpl);
+            //this.template = Handlebars.compile(tpl);
 
             this._setColumns();
             this._initContainer(); 
@@ -429,8 +432,7 @@
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
-            var template = this.template,
-                content = $.trim(this.template(data)), //$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+            var content = $.trim(this.options.renderData(data));//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
                 $newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
 
@@ -596,5 +598,5 @@
  * 增加mustache有等模板支持 
  * 增加公用方法
  * 数据居左、中、右 - done
- * 数据块固定位置如居中，居左，在固定列等 
+ * 数据块固定位置如居中，居左  done?多个item固定测试
  */
