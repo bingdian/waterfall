@@ -124,9 +124,12 @@
                 self._debug('loading', 'start');
             };
             
-            // loading finished function
-            options.loading.finished = options.loading.finished || function() {
-                if ( !options.state.isBeyondMaxPage ) {
+            /*
+             * loading finished function
+             * @param {Boolean} isBeyondMaxPage 
+             */
+            options.loading.finished = options.loading.finished || function(isBeyondMaxPage) {
+                if ( !isBeyondMaxPage ) {
                     self.$loading.fadeOut();
                     self._debug('loading', 'finished');
                 } else {
@@ -321,7 +324,7 @@
             // 超过最大页数 return
             if ( maxPage !== undefined && curPage > maxPage ){
                 options.state.isBeyondMaxPage = true;
-                options.loading.finished();
+                options.loading.finished( options.state.isBeyondMaxPage );
                 //this.destroy();
                 return;
             }
@@ -330,6 +333,8 @@
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
 			this._debug('heading into ajax', pageurl);
             
+            // loading start
+            options.loading.start();
             
             // 记录ajax请求状态
             this.options.state.isDuringAjax = true;
@@ -386,7 +391,7 @@
             this.layout($newItems, callback);
             
             //loading finished
-            this.options.loading.finished();
+            this.options.loading.finished( this.options.state.isBeyondMaxPage );
         },
         
         /*
@@ -409,8 +414,6 @@
             if ( xhr === 'failed' ) {
                 this.$loading.html(options.loading.ajaxFailed);
             }
-            
-            
         },
         
         
@@ -454,8 +457,6 @@
 				return;
 			}
             
-            // loading start
-            options.loading.start();
             this._requestData();
         },
         
