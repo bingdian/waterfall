@@ -20,7 +20,6 @@
             gutterWidth: 0, //数据块水平间距
             gutterHeight: 0, //数据块垂直间距
             align: 'center', //数据块相对于容器对齐方式，'align', 'left', 'right'
-            //fixMarginLeft: 0, //根据数据块对齐方式修正数据块postion left值
             minCol: 1,  //数据块最小列数
             maxPage: undefined, //最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
@@ -55,6 +54,7 @@
             path: undefined, // 瀑布流数据分页url，可以是数组如["/page/", "/"]，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
             dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
+
             renderData: function(data) {
                 var tpl = $('#waterfall-tpl').html(),
                     template = Handlebars.compile(tpl);
@@ -109,19 +109,12 @@
         _init: function( callback ) {
             var self = this,
                 options = this.options,
-                path = options.path,
-                tpl = options.tpl;
+                path = options.path;
                 
             if ( !path ) { // 没有提供api
                 this._debug('Invalid path');
                 return;
             }
-            
-            /*
-            if ( !tpl ) {// 没有提供模板
-                this._debug('Template needed');
-                return;
-            }*/
             
             // loading start function
             options.loading.start = options.loading.start || function() {
@@ -143,15 +136,11 @@
                     // do ...
                 }
             };
-            
-            //template
-            //this.template = Handlebars.compile(tpl);
 
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray();
             this._reLayout( callback ); // 对已有数据块重排
-            
             
             // auto prefill
             if ( options.isAutoPrefill ) {
@@ -159,7 +148,7 @@
 			}
 
             //绑定事件
-            //this._doResize();
+            this._doResize();
             this._doScroll();
         },
         
@@ -253,13 +242,13 @@
             
             
             // 设置数据块的位置样式
-            for (var i = 0, len = $items.length; i < len; i++) {
+            for (var i = 0, itemsLen = $items.length; i < itemsLen; i++) {
                 this._placeItems( $items[i], fixMarginLeft);
             }
 
             // 应用数据块样式
-            for (i=0, len = this.styleQueue.length; i < len; i++) {
-                obj = this.styleQueue[i];
+            for (var j= 0, styleLen = this.styleQueue.length; j < styleLen; j++) {
+                obj = this.styleQueue[j];
                 obj.$el[ styleFn ]( obj.style, animationOptions );
             }
             
@@ -288,8 +277,7 @@
          */
         _placeItems: function( item, fixMarginLeft ) {
            
-            var self = this,
-                $item = $(item),
+            var $item = $(item),
                 options = this.options,
                 colWidth = options.colWidth,
                 gutterWidth = options.gutterWidth,
@@ -314,7 +302,7 @@
             position = {
                 left: (colWidth + gutterWidth) * colIndex  + fixMarginLeft,
                 top: minColHeight  
-            }
+            };
 
             
             //插入动画效果队列
@@ -331,7 +319,7 @@
          * 全部重排数据块
          */
         _reLayout: function( callback ) {
-            var $items = this._getItems(this.$element.find('.' + this.options.itemCls))
+            var $items = this._getItems(this.$element.find('.' + this.options.itemCls));
             
             this._resetColumnsHeightArray(); //重置高度数组
             
@@ -348,7 +336,6 @@
                 curPage = options.state.curPage++, // increment
                 path = options.path,
                 dataType = options.dataType,
-                timestamp = new Date().getTime(),
                 params = options.params,
                 pageurl;
 
@@ -377,18 +364,18 @@
                 data: params,
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
-                    condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
+                    var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
                     //console.log(textStatus);
                     //console.log(jqXHR);
                     //console.log(condition);
                     
                     if (condition) {
                         // 模拟数据加载延迟
-                        /*
+                        
                         setTimeout(function() {
                             self._handleResponse(data, callback);
-                        }, 1500);*/
-                        self._handleResponse(data, callback);
+                        }, 1500);
+                        /*self._handleResponse(data, callback);*/
                     } else {
                         self._responeseError('end');
                     }
@@ -409,7 +396,7 @@
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
-            var content = $.trim(this.options.renderData(data));//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+            var content = $.trim(this.options.renderData(data)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
                 $newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
 
@@ -510,11 +497,7 @@
          */
         _resize: function() {
             var cols = this.cols,
-                newCols = this._getColumns(), //resize后获取页面可以显示列数
-                i = 0,
-                len;
-            
-            this._debug('resize', 'before resize:' + cols, 'resize end:' + newCols)
+                newCols = this._getColumns(); //resize后获取页面可以显示列数
             
             //列数没变化不调整
             //页面列数有变化时resize
@@ -548,7 +531,7 @@
 
         }
         
-    }
+    };
     
     
     $.fn[pluginName] = function(options) {
