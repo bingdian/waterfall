@@ -14,7 +14,6 @@
         defaults = {
             itemCls: 'waterfall-item',  //瀑布流数据块class
             prefix: 'waterfall', //瀑布流元素前辍
-            
             fitWidth: true, //是否自适应父元素宽度
             colWidth: 240,  //数据块每列宽度
             gutterWidth: 0, //数据块水平间距
@@ -23,19 +22,18 @@
             minCol: 1,  //数据块最小列数
             maxPage: undefined, //最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
-            
             containerStyle: { //瀑布流元素样式
                 position: 'relative'
             },
-            
             resizable: true, //缩放时是否触发数据重排?false时测试数据是否会自动加载
             isFadeIn: true, // 新插入数据是否使用fade动画
             isAnimated: false, //重排数据是否显示动画
             animationOptions: {
             },
-            isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据 
-            
-            
+            isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据
+            path: undefined, // 瀑布流数据分页url，可以是数组如["/page/", "/"]，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
+            dataType: 'json', //json, jsonp, html
+            params: {}, //瀑布流数据请求参数
             loading: {
                 loadingMsg: '<div style="text-align:center;padding:10px 0 ;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>',
                 ajaxFailedMsg: 'ajax request failed, please try again later',
@@ -43,23 +41,27 @@
                 finished: undefined
             },  //数据加载中内容
             
-            state: {
-                isDuringAjax: false,
+            state: { 
+                isDuringAjax: false, 
                 isProcessingData: false, //处理数据状态，从发送ajax请求开始到瀑布流数据排列结束
                 isDestroyed: false,
                 isDone: false, 
                 curPage: 1
             },
             
-            path: undefined, // 瀑布流数据分页url，可以是数组如["/page/", "/"]，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
-            dataType: 'json', //json, jsonp, html
-            params: {}, //瀑布流数据请求参数
-
             renderData: function(data) {
                 var tpl = $('#waterfall-tpl').html(),
                     template = Handlebars.compile(tpl);
                     
                 return template(data);
+            },
+            
+            //callbacks
+            callbacks: {
+                loadingStart: $.noop,
+                loadingFinished: $.noop,
+                loadingError: $.noop,
+                renderData: $.noop,
             },
             
             debug: true
@@ -326,6 +328,22 @@
             this.layout( $items, callback );
         },
         
+        
+        addItems: function($items) {
+        },
+        
+        appended: function($items) {
+        },
+        
+        removeItems:function($items) {
+        },
+        
+        reLayout: function() {
+        },
+        
+        destroy: function() {
+        },
+        
         /**
          * 请求api数据
          */
@@ -524,13 +542,7 @@
                     self._resize();
                 }, 100); 
             });
-        },
-        
-        
-        destroy: function() {
-
         }
-        
     };
     
     
