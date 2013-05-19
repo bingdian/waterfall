@@ -20,6 +20,7 @@
             gutterWidth: 0, //数据块水平间距
             gutterHeight: 0, //数据块垂直间距
             align: 'center', //数据块相对于容器对齐方式，'align', 'left', 'right'
+            //fixMarginLeft: 0, //根据数据块对齐方式修正数据块postion left值
             minCol: 1,  //数据块最小列数
             maxPage: undefined, //最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
@@ -232,13 +233,29 @@
             var options = this.options,
                 styleFn = this.options.isAnimated ? 'animate' : 'css', // 数据块动画效果
                 animationOptions = options.animationOptions,
+                colWidth = options.colWidth,
+                gutterWidth = options.gutterWidth,
+                gutterHeight = options.gutterHeight,
+                len = this.colHeightArray.length,
+                align = options.align,
+                fixMarginLeft,
                 obj;
             
             this.options.state.isDuringLayout = true;
             
+            //计算item的left margin
+            if ( align === 'center' ) {
+                fixMarginLeft = (this.$container.width() - (colWidth + gutterWidth) * len) /2;
+            } else if ( align === 'left' ) {
+                fixMarginLeft = 0;
+            } else if ( align === 'right' ) {
+                fixMarginLeft = this.$container.width() - (colWidth + gutterWidth) * len;
+            }
+            console.log(this.$container.width());
+            
             // 设置数据块的位置样式
             for (var i = 0, len = $items.length; i < len; i++) {
-                this._placeItems( $items[i] );
+                this._placeItems( $items[i], fixMarginLeft);
             }
 
             // 应用数据块样式
@@ -252,6 +269,7 @@
             
             //清除队列
             this.styleQueue = [];
+            
             
             // 更新排列完成状态
             this.options.state.isDuringLayout = false;
@@ -269,7 +287,7 @@
         /*
          * 设置数据块的位置样式
          */
-        _placeItems: function( item ) {
+        _placeItems: function( item, fixMarginLeft ) {
             var self = this,
                 $item = $(item),
                 options = this.options,
@@ -280,29 +298,12 @@
                 len = colHeightArray.length,
                 minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
                 minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
-                align = options.align,
-                margin,
-                x,
-                y,
-                position;
-            
-            console.log(this.$container.width());
-            
-            if ( align === 'center' ) {
-                margin = (this.$container.width() - (colWidth + gutterWidth) * len) /2;
-            } else if ( align === 'left' ) {
-                margin = 0;
-            } else if ( align === 'right' ) {
-                margin = this.$container.width() - (colWidth + gutterWidth) * len;
-            }
-            
-            x = (colWidth + gutterWidth) * minColIndex;
-            y = minColHeight;
-                
-            position = {
-                left: x + margin,
-                top: y
-            }
+                x = (colWidth + gutterWidth) * minColIndex  + fixMarginLeft,
+                y = minColHeight,
+                position = {
+                    left: x,
+                    top: y
+                };
             
             //插入动画效果队列
             this.styleQueue.push({ $el: $item, style: position });
@@ -510,6 +511,7 @@
             //列数没变化不调整
             //页面列数有变化时resize
             //瀑布流数据块居中对齐resize
+            
             if ( newCols !== cols || this.options.align !== 'left' ) {
                 this.cols = newCols; //更新列数
                 this._reLayout(); //重排数据
@@ -552,7 +554,7 @@
 }( jQuery, window, document ));
 /*
  * To do
- * 改进瀑布流数据块算法 - ok
+ * 改进瀑布流数据块算法 
  * 瀑布流animate - ok
  * fix横向滚动条 - ok
  * 优化动画效果
