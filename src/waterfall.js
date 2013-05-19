@@ -181,12 +181,12 @@
         _getColumns : function() {
             var options = this.options,
                 $container = options.fitWidth ?  this.$element.parent() : this.$element,
-                containerWidth = $container.width(),
+                containerWidth = $container[0].tagName === 'BODY' ? $container.width() - 20 : $container.width(), //如果container是body标签，减去滚动条宽度
                 colWidth = options.colWidth,
                 gutterWidth = options.gutterWidth,
                 minCol = options.minCol,
                 cols = Math.floor(containerWidth / (colWidth + gutterWidth));
-            
+
             return  Math.max(cols, minCol );
         },
         
@@ -538,11 +538,11 @@
  * 瀑布流animate - ok
  * 优化动画效果
  * page path 方法 - ok
- * 插入数据时效果append effect
+ * 插入数据时效果append effect 
  * 测试ajax数据顺序
- * 跨域
- * 增加mustache有等模板支持
+ * 跨域 
+ * 增加mustache有等模板支持 
  * 增加公用方法
  * 数据居左、中、右
- * 数据块固定位置如居中，居左，在固定列等
+ * 数据块固定位置如居中，居左，在固定列等 
  */
