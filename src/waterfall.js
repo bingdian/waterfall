@@ -19,6 +19,7 @@
             colWidth: 240,  //数据块每列宽度
             gutterWidth: 0, //数据块水平间距
             gutterHeight: 0, //数据块垂直间距
+            align: 'center', //数据块相对于容器对齐方式，'align', 'left', 'right'
             minCol: 1,  //数据块最小列数
             maxPage: undefined, //最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
@@ -278,13 +279,30 @@
                 colHeightArray = this.colHeightArray,
                 len = colHeightArray.length,
                 minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
-                minColIndex = $.inArray(minColHeight, colHeightArray);        //当前所有列中最小高度下标,
-                x = (colWidth + gutterWidth) * minColIndex,
-                y = minColHeight,
-                position = {
-                    left: x,
-                    top: y
-                };
+                minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
+                align = options.align,
+                margin,
+                x,
+                y,
+                position;
+            
+            console.log(this.$container.width());
+            
+            if ( align === 'center' ) {
+                margin = (this.$container.width() - (colWidth + gutterWidth) * len) /2;
+            } else if ( align === 'left' ) {
+                margin = 0;
+            } else if ( align === 'right' ) {
+                margin = this.$container.width() - (colWidth + gutterWidth) * len;
+            }
+            
+            x = (colWidth + gutterWidth) * minColIndex;
+            y = minColHeight;
+                
+            position = {
+                left: x + margin,
+                top: y
+            }
             
             //插入动画效果队列
             this.styleQueue.push({ $el: $item, style: position });
@@ -300,7 +318,7 @@
          * 全部重排数据块
          */
         _reLayout: function( callback ) {
-            var $items = this.$element.find('.' + this.options.itemCls);
+            var $items = this._getItems(this.$element.find('.' + this.options.itemCls))
             
             this._resetColumnsHeightArray(); //重置高度数组
             
@@ -487,12 +505,12 @@
                 i = 0,
                 len;
             
-            console.log('resize之前列数:' + cols);    
-            console.log('resize之后列数:' + newCols);
+            this._debug('resize', 'before resize:' + cols, 'resize end:' + newCols)
             
             //列数没变化不调整
             //页面列数有变化时resize
-            if ( newCols !== cols) {
+            //瀑布流数据块居中对齐resize
+            if ( newCols !== cols || this.options.align !== 'left' ) {
                 this.cols = newCols; //更新列数
                 this._reLayout(); //重排数据
             }
@@ -536,6 +554,7 @@
  * To do
  * 改进瀑布流数据块算法 - ok
  * 瀑布流animate - ok
+ * fix横向滚动条 - ok
  * 优化动画效果
  * page path 方法 - ok
  * 插入数据时效果append effect 
@@ -543,6 +562,6 @@
  * 跨域 
  * 增加mustache有等模板支持 
  * 增加公用方法
- * 数据居左、中、右
+ * 数据居左、中、右 - ok
  * 数据块固定位置如居中，居左，在固定列等 
  */
