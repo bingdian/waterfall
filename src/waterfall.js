@@ -44,7 +44,7 @@
             
             state: {
                 isDuringAjax: false,
-                isLaidOut: false,
+                isDuringLayout: false,
                 isDestroyed: false,
                 isDone: false, 
                 curPage: 1
@@ -68,7 +68,7 @@
         this.$element = $(element);
         this.options = $.extend( {}, defaults, options);
         this.colHeightArray = []; // 瀑布流各列高度数组
-        this.styleQueue = []; //
+        this.styleQueue = []; 
         
         this._init();
     }
@@ -205,13 +205,11 @@
          */
         layout: function($items, callback) {
             var options = this.options,
-            /*
-                styleFn = !this.isLaidOut ? 'css' : (
-                    this.options.isAnimated ? 'animate' : 'css'
-                ), // 数据块动画效果*/
                 styleFn = this.options.isAnimated ? 'animate' : 'css', // 数据块动画效果
                 animationOptions = options.animationOptions,
                 obj;
+            
+            this.options.state.isDuringLayout = true;
             
             // 设置数据块的位置样式
             for (var i = 0, len = $items.length; i < len; i++) {
@@ -230,11 +228,11 @@
             //清除队列
             this.styleQueue = [];
             
-            //
-            this.options.state.isLaidOut = true;
+            // 更新排列完成状态
+            this.options.state.isDuringLayout = false;
             
-            // 加载完不够一屏再次检测
-            this._prefill();
+            // 数据排玩完成不足一屏再次填充数据
+            this._fillData();
             
             // callback
             if ( callback ) {
@@ -340,14 +338,13 @@
                         // 模拟数据加载延迟
                         setTimeout(function() {
                             self._handleResponse(data, callback);
-                        }, 1000);
-                        /*
-                        self._handleResponse(data, callback);*/
+                        }, 600);
+                        /*self._handleResponse(data, callback);*/
                     } else {
                         self._responeseError('end');
                     }
                     
-                    self.options.state.isLaidOut = false;
+                    self.options.state.isDuringLayout = false;
                     self.options.state.isDuringAjax = false;
                 },
                 error: function() {
@@ -417,21 +414,26 @@
         },
         
         /*
-         * _prefill
+         * 预填充数据
          */
         _prefill: function() {
+            this._fillData();
+        },
+        
+        /*
+         * fillData
+         * 自动填充数据
+         */
+        _fillData: function() {
             var options = this.options,
-                state = options.state,
-                diff = options.diff,    //为正时可以看到瀑布流底部
-                loadLine = $(window).scrollTop() + $(window).height() - this.$element.offset().top  - options.bufferPixel, //预加载线
-                minColHeight = Math.min.apply({}, this.colHeightArray);
+                state = options.state;
             
-            console.log(state.isLaidOut);
+            console.log(state.isDuringLayout);
             
-            // !state.isLaidOut 数据还没有排列完成 return
+            // state.isDuringLayout 数据还没有排列完成 return
             // ajax数据正在请求还没有完成 return
             // 
-            if ( !state.isLaidOut || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
+            if ( state.isDuringLayout || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
 				return;
 			}
             
@@ -454,7 +456,7 @@
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     self._debug('event', 'scroll ...');
-                    self._prefill();
+                    self._fillData();
                 }, 100);
             });
         },
