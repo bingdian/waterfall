@@ -12,56 +12,83 @@
      */
     var pluginName = 'waterfall',
         defaults = {
-            itemCls: 'waterfall-item',  //瀑布流数据块class
-            prefix: 'waterfall', //瀑布流元素前辍
-            fitWidth: true, //是否自适应父元素宽度
-            colWidth: 240,  //数据块每列宽度
-            gutterWidth: 0, //数据块水平间距
-            gutterHeight: 0, //数据块垂直间距
-            align: 'center', //数据块相对于容器对齐方式，'align', 'left', 'right'
-            minCol: 1,  //数据块最小列数
-            maxPage: undefined, //最多显示多少页数据,默认undefined，无限下拉
+            itemCls: 'waterfall-item',  // 瀑布流数据块class
+            prefix: 'waterfall', // 瀑布流元素前辍
+            fitWidth: true, // 是否自适应父元素宽度
+            colWidth: 240,  // 数据块每列宽度
+            gutterWidth: 0, // 数据块水平间距
+            gutterHeight: 0, // 数据块垂直间距
+            align: 'center', // 数据块相对于容器对齐方式，'align', 'left', 'right'
+            minCol: 1,  // 数据块最小列数
+            maxPage: undefined, // 最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
-            containerStyle: { //瀑布流元素样式
+            containerStyle: { // 瀑布流元素样式
                 position: 'relative'
             },
-            resizable: true, //缩放时是否触发数据重排?false时测试数据是否会自动加载
+            resizable: true, // 缩放时是否触发数据重排?false时测试数据是否会自动加载
             isFadeIn: true, // 新插入数据是否使用fade动画
             isAnimated: false, //重排数据是否显示动画
             animationOptions: {
             },
             isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据
-            path: undefined, // 瀑布流数据分页url，可以是数组如["/page/", "/"]，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
+            path: undefined, // 瀑布流数据分页url，可以是数组如["/popular/page/", "/"] => "/popular/page/1/"，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
             dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
-            loading: {
-                loadingMsg: '<div style="text-align:center;padding:10px 0 ;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>',
-                ajaxFailedMsg: 'ajax request failed, please try again later',
-                start: undefined,
-                finished: undefined
-            },  //数据加载中内容
+            
+            
+            loadingMsg: '<div style="text-align:center;padding:10px 0 ;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>',
             
             state: { 
                 isDuringAjax: false, 
                 isProcessingData: false, //处理数据状态，从发送ajax请求开始到瀑布流数据排列结束
-                isDestroyed: false,
-                isDone: false, 
+                //isDestroyed: false,
+                //isDone: false, 
                 curPage: 1
             },
-            
-            renderData: function(data) {
-                var tpl = $('#waterfall-tpl').html(),
-                    template = Handlebars.compile(tpl);
-                    
-                return template(data);
-            },
-            
-            //callbacks
+
+            // callbacks
             callbacks: {
-                loadingStart: $.noop,
-                loadingFinished: $.noop,
-                loadingError: $.noop,
-                renderData: $.noop,
+                /*
+                 * ajax请求开始之前
+                 * @param {Object} loading $('#waterfall-loading')
+                 */
+                loadingStart: function($loading) {
+                    $loading.show();
+                    //console.log('loading', 'start');
+                },
+                
+                /*
+                 * ajax请求加载完成
+                 * @param {Object} loading $('#waterfall-loading')
+                 * @param {Boolean} isBeyondMaxPage
+                 */
+                loadingFinished: function($loading, isBeyondMaxPage) {
+                    if ( !isBeyondMaxPage ) {
+                        $loading.fadeOut();
+                        //console.log('loading finished');
+                    } else {
+                        //console.log('loading isBeyondMaxPage');
+                        $loading.remove();
+                    }
+                },
+                
+                /*
+                 * ajax请求出错误
+                 * @param {String} xhr , end/failed
+                 */
+                loadingError: function(xhr) {
+                },
+                
+                /*
+                 * 处理ajax返回数方法
+                 * @param {String} data
+                 */
+                renderData: function (data) {
+                    var tpl = $('#waterfall-tpl').html(),
+                        template = Handlebars.compile(tpl);
+                        
+                    return template(data);
+                },
             },
             
             debug: true
@@ -118,27 +145,7 @@
                 return;
             }
             
-            // loading start function
-            options.loading.start = options.loading.start || function() {
-                self.$loading.show();
-                self._debug('loading', 'start');
-            };
             
-            /*
-             * loading finished function
-             * @param {Boolean} isBeyondMaxPage 
-             */
-            options.loading.finished = options.loading.finished || function(isBeyondMaxPage) {
-                if ( !isBeyondMaxPage ) {
-                    self.$loading.fadeOut();
-                    self._debug('loading', 'finished');
-                } else {
-                    self._debug('loading', 'isBeyondMaxPage');
-                    self.$loading.remove();
-                    // do ...
-                }
-            };
-
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray();
@@ -163,7 +170,7 @@
                 
             //如果没有数据再插入div
             this.$element.css(this.options.containerStyle).addClass(prefix + '-container');
-            this.$element.after('<div id="' + prefix + '-loading">' +options.loading.loadingMsg+ '</div>');
+            this.$element.after('<div id="' + prefix + '-loading">' +options.loadingMsg+ '</div>');
             
             this.$container = this.$element;
             this.$loading = $('#' + prefix + '-loading');
@@ -360,21 +367,21 @@
             // 超过最大页数 return
             if ( maxPage !== undefined && curPage > maxPage ){
                 options.state.isBeyondMaxPage = true;
-                options.loading.finished( options.state.isBeyondMaxPage );
-                //this.destroy();
+                options.callbacks.loadingFinished(this.$loading, options.state.isBeyondMaxPage);
                 return;
             }
             
             // 获取数据url
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
+            
 			this._debug('heading into ajax', pageurl);
             
             // loading start
-            options.loading.start();
+            options.callbacks.loadingStart(this.$loading);
             
             // 记录ajax请求状态
-            this.options.state.isDuringAjax = true;
-            this.options.state.isProcessingData = true;
+            options.state.isDuringAjax = true;
+            options.state.isProcessingData = true;
             
             //请求数据
             $.ajax({
@@ -383,13 +390,9 @@
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
                     var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
-                    //console.log(textStatus);
-                    //console.log(jqXHR);
-                    //console.log(condition);
-                    
-                    if (condition) {
+                    console.log(textStatus);
+                    if ( condition ) {
                         // 模拟数据加载延迟
-                        
                         setTimeout(function() {
                             self._handleResponse(data, callback);
                         }, 1500);
@@ -414,10 +417,10 @@
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
-            var content = $.trim(this.options.renderData(data)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+            var content = $.trim(this.options.callbacks.renderData(data)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
                 $newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
-
+                
             //处理后html插入瀑布流 
             this.$element.append($content);
             
@@ -425,7 +428,7 @@
             this.layout($newItems, callback);
             
             //loading finished
-            this.options.loading.finished( this.options.state.isBeyondMaxPage );
+            this.options.callbacks.loadingFinished(this.$loading, this.options.state.isBeyondMaxPage);
         },
         
         /*
@@ -433,21 +436,14 @@
          * _responeseError
          */
         _responeseError: function(xhr) {
-            var options = this.options;
-
-            if (xhr !== 'destroy' && xhr !== 'end' && xhr !== 'failed' ) {
+            
+            if (xhr === 'end' || xhr === 'failed' ) {
+                this.options.callbacks.loadingError(xhr);
+            } else {
                 xhr = 'unknown';
             }
             
             this._debug('Error', xhr);
-            
-            if (xhr === 'end' || options.state.isBeyondMaxPage) {
-                
-            }
-            
-            if ( xhr === 'failed' ) {
-                this.$loading.html(options.loading.ajaxFailed);
-            }
         },
         
         
