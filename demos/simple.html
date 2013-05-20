@@ -42,9 +42,8 @@ $('#waterfall').waterfall({
     gutterWidth: 15,
     gutterHeight: 15,
     maxPage: 5,
-    loading: {
-        finished: function(isBeyondMaxPage) {
-            $loading = $('#waterfall-loading');
+    callbacks: {
+        loadingFinished: function($loading, isBeyondMaxPage) {
             if ( !isBeyondMaxPage ) {
                 $loading.fadeOut();
             } else {
@@ -52,7 +51,7 @@ $('#waterfall').waterfall({
                 $('#page-navigation').show();
             }
         }
-    },  //数据加载中内容
+    },
     path: function(page) {
         return 'data/data' + page + '.json';
     },
