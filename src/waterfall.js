@@ -87,7 +87,7 @@
                         template = Handlebars.compile(tpl);
                         
                     return template(data);
-                },
+                }
             },
             
             debug: true
@@ -330,7 +330,7 @@
             colHeightArray[colIndex] += $item.outerHeight() + gutterHeight;
             
             //item添加class
-            $item.addClass('col-' + colIndex);
+            $item.attr('data-col', colIndex);
         },
         
         /*
