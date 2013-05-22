@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>使用其它模板如mustache解析json数据</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+</head>
+<body>
+<div id="header">
+    <h1>simple waterfall demo</h1>
+</div>
+<div id="waterfall"></div>
+<script type="text/template" id="waterfall-tpl">
+{{#result}}
+    <div class="item" width="230">
+        <img src="{{image}}" width="{{width}}" height="{{height}}" />
+    </div>
+{{/result}}
+</script>
+<script src="../libs/jquery/jquery.js"></script>
+<script src="../libs/mustache/mustache.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#waterfall').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    path: function(page) {
+        return 'data/data1.json?page=' + page;
+    },
+    params: {
+        type: 'popular',
+        start: 10000,
+        perPage: 20
+    },
+    callbacks: {
+        /*
+        * 处理ajax返回数方法
+        * @param {String} data
+        */
+       renderData: function (data) {
+           var template = $('#waterfall-tpl').html();
+           
+           return Mustache.to_html(template, data).replace(/^\s*/mg, '')
+       }
+    }
+});
+</script>
+</body>
+</html>

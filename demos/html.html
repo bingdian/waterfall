@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax加载html格式</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+</head>
+<body>
+<div id="header">
+    <h1>simple waterfall demo</h1>
+</div>
+<div id="waterfall"></div>
+<script src="../libs/jquery/jquery.js"></script>
+<script src="../libs/handlebars/handlebars.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#waterfall').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    dataType: 'html',
+    path: function(page) {
+        return 'data/data.html?page=' + page;
+    },
+    params: {
+        type: 'popular',
+        start: 10000,
+        perPage: 20
+    }
+});
+</script>
+</body>
+</html>

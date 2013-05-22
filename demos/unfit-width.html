@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义瀑布流宽度</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+</head>
+<body>
+<div id="header">
+    <h1>simple waterfall demo</h1>
+</div>
+<div id="waterfall"></div>
+<script type="text/x-handlebars-template" id="waterfall-tpl">
+{{#result}}
+    <div class="item" width="230">
+        <img src="{{image}}" width="{{width}}" height="{{height}}" />
+    </div>
+{{/result}}
+</script>
+<script src="../libs/jquery/jquery.js"></script>
+<script src="../libs/handlebars/handlebars.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#waterfall').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    minCol: 2,
+    maxCol: 4,
+    path: function(page) {
+        return 'data/data1.json?page=' + page;
+    },
+    params: {
+        type: 'popular',
+        start: 10000,
+        perPage: 20
+    }
+});
+</script>
+</body>
+</html>

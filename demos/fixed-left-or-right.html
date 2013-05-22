@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>左侧或右侧固定列</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+</head>
+<body>
+<div id="header">
+    <h1>simple waterfall demo</h1>
+</div>
+<div id="waterfall">
+    <div class="item waterfall-item-fixed-left" style="height: 180px;">left</div>
+    <div class="item waterfall-item-fixed-right" style="height: 120px;">right</div>
+    <div class="item waterfall-item-fixed-left" style="height: 230px;">left</div>
+    <div class="item waterfall-item-fixed-right" style="height: 170px;">right</div>
+</div>
+<script type="text/x-handlebars-template" id="waterfall-tpl">
+{{#result}}
+    <div class="item" width="230">
+        <img src="{{image}}" width="{{width}}" height="{{height}}" />
+    </div>
+{{/result}}
+</script>
+<script src="../libs/jquery/jquery.js"></script>
+<script src="../libs/handlebars/handlebars.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#waterfall').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    path: function(page) {
+        return 'data/data1.json?page=' + page;
+    },
+    params: {
+        type: 'popular',
+        start: 10000,
+        perPage: 20
+    }
+});
+</script>
+</body>
+</html>
