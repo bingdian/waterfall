@@ -27,9 +27,9 @@
                 position: 'relative'
             },
             resizable: true, // 缩放时是否触发数据重排?false时测试数据是否会自动加载
-            isFadeIn: true, // 新插入数据是否使用fade动画
-            isAnimated: false, //重排数据是否显示动画
-            animationOptions: {
+            isFadeIn: false, // 新插入数据是否使用fade动画
+            isAnimated: false, // resize时数据是否显示动画
+            animationOptions: { // 动画效果
             },
             isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据
             path: undefined, // 瀑布流数据分页url，可以是数组如["/popular/page/", "/"] => "/popular/page/1/"，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
@@ -41,6 +41,7 @@
             state: { 
                 isDuringAjax: false, 
                 isProcessingData: false, //处理数据状态，从发送ajax请求开始到瀑布流数据排列结束
+                isResizing: false,
                 curPage: 1 //当前第几页，默认第一页
             },
 
@@ -236,7 +237,7 @@
          */
         layout: function($items, callback) {
             var options = this.options,
-                styleFn = this.options.isAnimated ? 'animate' : 'css', // 数据块动画效果
+                styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css', // 数据块动画效果
                 animationOptions = options.animationOptions,
                 colWidth = options.colWidth,
                 gutterWidth = options.gutterWidth,
@@ -275,6 +276,7 @@
             
             
             // 更新排列完成状态
+            this.options.state.isResizing = false;
             this.options.state.isProcessingData = false;
             
             // 数据排玩完成不足一屏再次填充数据
@@ -425,8 +427,8 @@
         _handleResponse: function(data, callback) {
             var content = $.trim(this.options.callbacks.renderData(data)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
-                $newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
-                
+                //$newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
+                $newItems = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content);
             //处理后html插入瀑布流 
             this.$element.append($content);
             
@@ -541,6 +543,7 @@
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     self._debug('event', 'resize ...');
+                    self.options.state.isResizing = true;
                     self._resize();
                 }, 100); 
             });
