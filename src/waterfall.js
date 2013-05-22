@@ -409,13 +409,12 @@
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
                     var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
-                    console.log(textStatus);
                     if ( condition ) {
                         // 模拟数据加载延迟
-                        setTimeout(function() {
+                        /*setTimeout(function() {
                             self._handleResponse(data, callback);
-                        }, 1500);
-                        /*self._handleResponse(data, callback);*/
+                        }, 1500);*/
+                        self._handleResponse(data, callback);
                     } else {
                         self._responeseError('end');
                     }
