@@ -185,9 +185,16 @@
                 colWidth = options.colWidth,
                 gutterWidth = options.gutterWidth,
                 minCol = options.minCol,
-                cols = Math.floor(containerWidth / (colWidth + gutterWidth));
-
-            return  Math.max(cols, minCol );
+                maxCol = options.maxCol,
+                cols = Math.floor(containerWidth / (colWidth + gutterWidth)),
+                col = Math.max(cols, minCol );
+            /*
+            if ( !maxCol ) {
+                return col;
+            } else {
+                return col > maxCol ? maxCol : col;
+            }*/
+            return maxCol ? col : (col > maxCol ? maxCol : col);
         },
         
         
