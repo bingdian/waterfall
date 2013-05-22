@@ -301,9 +301,10 @@
                 gutterHeight = options.gutterHeight,
                 colHeightArray = this.colHeightArray,
                 len = colHeightArray.length,
+                //curColHeight,
                 minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
                 minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
-                colIndex,
+                colIndex, // item要插入的列index
                 position;
                 
              
@@ -318,7 +319,7 @@
             
             position = {
                 left: (colWidth + gutterWidth) * colIndex  + fixMarginLeft,
-                top: minColHeight  
+                top: colHeightArray[colIndex]  // item要插入的列高度 
             };
 
             
