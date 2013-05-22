@@ -34,6 +34,10 @@ a:hover {
 /*
  * waterfall
  */
+.waterfall-with-width {
+	width: 1000px;
+	margin: 0 auto;
+}
 .item {
     position: absolute;
     top: 0;
