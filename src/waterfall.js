@@ -510,7 +510,7 @@
                 timer = setTimeout(function() {
                     self._debug('event', 'scroll ...');
                     self._fillData();
-                }, 100);
+                }, 30);
             });
         },
         
@@ -546,7 +546,7 @@
                     self._debug('event', 'resize ...');
                     self.options.state.isResizing = true;
                     self._resize();
-                }, 100); 
+                }, 30); 
             });
         }
     };
