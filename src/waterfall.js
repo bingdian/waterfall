@@ -82,11 +82,18 @@
                  * 处理ajax返回数方法
                  * @param {String} data
                  */
-                renderData: function (data) {
-                    var tpl = $('#waterfall-tpl').html(),
+                renderData: function (data, dataType) {
+                    var tpl,
+                        template;
+                        
+                    if ( dataType === 'json' ||  dataType === 'jsonp'  ) { // json或jsonp格式
+                        tpl = $('#waterfall-tpl').html(),
                         template = Handlebars.compile(tpl);
                         
-                    return template(data);
+                        return template(data);
+                    } else { // html格式
+                        return data;
+                    }
                 }
             },
             
@@ -145,6 +152,7 @@
             }
             
             
+            
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray(); // 设置瀑布流高度数组
@@ -154,6 +162,8 @@
             if ( options.isAutoPrefill ) {
 				this._prefill();
 			}
+            
+            
 
             //绑定事件
             this._doResize();
@@ -426,7 +436,7 @@
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
-            var content = $.trim(this.options.callbacks.renderData(data)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+            var content = $.trim(this.options.callbacks.renderData(data), this.options.dataType),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
                 //$newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
                 $newItems = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content);
