@@ -153,8 +153,6 @@
                 return;
             }
             
-            
-            
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray(); // 设置瀑布流高度数组
@@ -165,8 +163,6 @@
 				this._prefill();
 			}
             
-            
-
             //绑定事件
             this._doResize();
             this._doScroll();
@@ -439,7 +435,7 @@
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
-            var content = $.trim(this.options.callbacks.renderData(data), this.options.dataType),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+            var content = $.trim(this.options.callbacks.renderData(data, this.options.dataType)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
                 //$newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
                 $newItems = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content);
