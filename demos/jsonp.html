@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>jsonp格式</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+<style>
+.item img { width: 192px;}
+</style>
+</head>
+<body>
+<div id="header">
+    <h1>simple waterfall demo</h1>
+</div>
+<div id="waterfall"></div>
+<script type="text/x-handlebars-template" id="waterfall-tpl">
+{{#photos}}
+    {{#photo}}
+    <div class="item" width="230">
+        <img height="{{height}}" alt="{{title}}" src="http://farm{{farm}}.static.flickr.com/{{server}}/{{id}}_{{secret}}_m.jpg" />
+    </div>
+    {{/photo}}
+{{/photos}}
+</script>
+<script src="../libs/jquery/jquery.js"></script>
+<script src="../libs/handlebars/handlebars.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#waterfall').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    path: function( page ) {
+        return 'http://api.flickr.com/services/rest/?page=' +page+ '&jsoncallback=?';
+    },
+    dataType: "jsonp",
+    jsonpCallback: "jsoncallback",
+    params: {
+        
+        'method': 'flickr.photos.search',
+        'api_key': 'f290d9d56bd82fde0c87d7fd6a0e6c33',
+        'tags': 'travel',
+        'per_page': 20,
+        'format': 'json'
+    }
+});
+</script>
+</body>
+</html>
