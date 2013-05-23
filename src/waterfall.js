@@ -1,6 +1,6 @@
 /*!
  * waterfall
- * http://wlog.cn/athena/waterfall/
+ * http://wlog.cn/waterfall/
  *
  * Copyright (c) 2013 bingdian
  * Licensed under the MIT license.
@@ -17,19 +17,19 @@
         defaults = {
             itemCls: 'waterfall-item',  // 瀑布流数据块class
             prefix: 'waterfall', // 瀑布流元素前辍
-            fitWidth: true, // 是否自适应父元素宽度
-            colWidth: 240,  // 数据块每列宽度
+            fitWidth: true, // 是否自适应父元素宽度,false时，瀑布流宽度为当前元素宽度
+            colWidth: 240,  // 瀑布流每列的宽度
             gutterWidth: 0, // 数据块水平间距
             gutterHeight: 0, // 数据块垂直间距
             align: 'center', // 数据块相对于容器对齐方式，'align', 'left', 'right'
             minCol: 1,  // 数据块最小列数
-            maxCol: undefined,
+            maxCol: undefined, // 数据块最多显示列数,默认undefined，最大列数无限制
             maxPage: undefined, // 最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
             containerStyle: { // 瀑布流元素样式
                 position: 'relative'
             },
-            resizable: true, // 缩放时是否触发数据重排?false时测试数据是否会自动加载
+            resizable: true, // 缩放时是否触发数据重排
             isFadeIn: false, // 新插入数据是否使用fade动画
             isAnimated: false, // resize时数据是否显示动画
             checkImagesLoaded: true, // 图片加载完成后开始排列数据块，如果直接后台输出图片尺寸，设置为false
@@ -165,7 +165,9 @@
 			}
             
             //绑定事件
-            this._doResize();
+            if ( options.resizable ) {
+                this._doResize();
+            }
             this._doScroll();
         },
         
