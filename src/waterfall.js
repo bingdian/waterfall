@@ -26,21 +26,21 @@
             maxCol: undefined, // 数据块最多显示列数,默认undefined，最大列数无限制
             maxPage: undefined, // 最多显示多少页数据,默认undefined，无限下拉
             bufferPixel: -50, // 滚动时, 窗口底部到瀑布流最小高度列的距离 > bufferPixel时, 自动加载新数据
-            containerStyle: { // 瀑布流元素样式
+            containerStyle: { // 瀑布流默认样式
                 position: 'relative'
             },
             resizable: true, // 缩放时是否触发数据重排
             isFadeIn: false, // 新插入数据是否使用fade动画
             isAnimated: false, // resize时数据是否显示动画
-            checkImagesLoaded: true, // 图片加载完成后开始排列数据块，如果直接后台输出图片尺寸，设置为false
-            animationOptions: { // 动画效果
+            animationOptions: { // resize动画效果，isAnimated为true时有效
             },
             isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据
+            checkImagesLoaded: true, // 是否图片加载完成后开始排列数据块。如果直接后台输出图片尺寸，可设置为false
             path: undefined, // 瀑布流数据分页url，可以是数组如["/popular/page/", "/"] => "/popular/page/1/"，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
             dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
             
-            loadingMsg: '<div style="text-align:center;padding:10px 0; color:#999;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // 加载提示，html
+            loadingMsg: '<div style="text-align:center;padding:10px 0; color:#999;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // 加载提示进度条，html
             
             state: { 
                 isDuringAjax: false, 
@@ -85,6 +85,7 @@
                 /*
                  * 处理ajax返回数方法
                  * @param {String} data
+                 * @param {String} dataType , "json", "jsonp", "html"
                  */
                 renderData: function (data, dataType) {
                     var tpl,
@@ -168,6 +169,7 @@
             if ( options.resizable ) {
                 this._doResize();
             }
+            
             this._doScroll();
         },
         
@@ -293,7 +295,7 @@
             this.options.state.isProcessingData = false;
             
             // 数据排玩完成不足一屏再次填充数据
-            //this._fillData();
+            //this._scroll();
             
             // callback
             if ( callback ) {
@@ -499,14 +501,18 @@
          * 预填充数据
          */
         _prefill: function() {
-            this._fillData();
+            
+            if ( this._nearbottom() ) {
+				this._scroll();
+			}
+
         },
         
         /*
-         * fillData
+         * _scroll
          * 自动填充数据
          */
-        _fillData: function() {
+        _scroll: function() {
             var options = this.options,
                 state = options.state;
             
@@ -536,7 +542,7 @@
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     self._debug('event', 'scroll ...');
-                    self._fillData();
+                    self._scroll();
                 }, 30);
             });
         },
@@ -554,6 +560,8 @@
             //瀑布流数据块居中对齐resize
             
             if ( newCols !== cols || this.options.align !== 'left' ) {
+                this._debug('event', 'resizing ...');
+                this.options.state.isResizing = true;
                 this.cols = newCols; //更新列数
                 this._reLayout(); //重排数据
             }
@@ -570,8 +578,6 @@
             $(window).bind('resize', function() {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    self._debug('event', 'resize ...');
-                    self.options.state.isResizing = true;
                     self._resize();
                 }, 30); 
             });
