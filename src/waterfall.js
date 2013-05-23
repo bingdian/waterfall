@@ -32,6 +32,7 @@
             resizable: true, // 缩放时是否触发数据重排?false时测试数据是否会自动加载
             isFadeIn: false, // 新插入数据是否使用fade动画
             isAnimated: false, // resize时数据是否显示动画
+            checkImagesLoaded: true, // 图片加载完成后开始排列数据块，如果直接后台输出图片尺寸，设置为false
             animationOptions: { // 动画效果
             },
             isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据
@@ -435,18 +436,33 @@
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
-            var content = $.trim(this.options.callbacks.renderData(data, this.options.dataType)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
+            var self = this,
+                options = this.options,
+                content = $.trim(options.callbacks.renderData(data, options.dataType)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
-                //$newItems = this._getItems($content)/*.css({ opacity: 0 }).animate({ opacity: 1 })*/;
-                $newItems = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content);
-            //处理后html插入瀑布流 
-            this.$element.append($content);
+                $newItems,
+                checkImagesLoaded = options.checkImagesLoaded;
             
-            //排列瀑布流数据
-            this.layout($newItems, callback);
+            function _handle() {
+                $newItems = self.options.isFadeIn ? self._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : self._getItems($content);
+                    
+                //处理后html插入瀑布流 
+                self.$element.append($newItems);
+                    
+                //排列瀑布流数据
+                self.layout($newItems, callback);
+                
+                //loading finished
+                self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
+            }
             
-            //loading finished
-            this.options.callbacks.loadingFinished(this.$loading, this.options.state.isBeyondMaxPage);
+            if ( !checkImagesLoaded ) { // 不需要检测图片是否加载完成
+                _handle();
+            } else {
+                $content.imagesLoaded(function() { // 图片是否加载完成回调
+                    _handle();
+                });
+            }
         },
         
         /*
@@ -570,3 +586,127 @@
     };
     
 }( jQuery, window, document ));
+
+
+/*!
+ * jQuery imagesLoaded plugin v2.1.2
+ * http://github.com/desandro/imagesloaded
+ *
+ * MIT License. by Paul Irish et al.
+ */
+
+;(function($, undefined) {
+'use strict';
+
+// blank image data-uri bypasses webkit log warning (thx doug jones)
+var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+$.fn.imagesLoaded = function( callback ) {
+	var $this = this,
+		deferred = $.isFunction($.Deferred) ? $.Deferred() : 0,
+		hasNotify = $.isFunction(deferred.notify),
+		$images = $this.find('img').add( $this.filter('img') ),
+		loaded = [],
+		proper = [],
+		broken = [];
+
+	// Register deferred callbacks
+	if ($.isPlainObject(callback)) {
+		$.each(callback, function (key, value) {
+			if (key === 'callback') {
+				callback = value;
+			} else if (deferred) {
+				deferred[key](value);
+			}
+		});
+	}
+
+	function doneLoading() {
+		var $proper = $(proper),
+			$broken = $(broken);
+
+		if ( deferred ) {
+			if ( broken.length ) {
+				deferred.reject( $images, $proper, $broken );
+			} else {
+				deferred.resolve( $images );
+			}
+		}
+
+		if ( $.isFunction( callback ) ) {
+			callback.call( $this, $images, $proper, $broken );
+		}
+	}
+
+	function imgLoadedHandler( event ) {
+		imgLoaded( event.target, event.type === 'error' );
+	}
+
+	function imgLoaded( img, isBroken ) {
+		// don't proceed if BLANK image, or image is already loaded
+		if ( img.src === BLANK || $.inArray( img, loaded ) !== -1 ) {
+			return;
+		}
+
+		// store element in loaded images array
+		loaded.push( img );
+
+		// keep track of broken and properly loaded images
+		if ( isBroken ) {
+			broken.push( img );
+		} else {
+			proper.push( img );
+		}
+
+		// cache image and its state for future calls
+		$.data( img, 'imagesLoaded', { isBroken: isBroken, src: img.src } );
+
+		// trigger deferred progress method if present
+		if ( hasNotify ) {
+			deferred.notifyWith( $(img), [ isBroken, $images, $(proper), $(broken) ] );
+		}
+
+		// call doneLoading and clean listeners if all images are loaded
+		if ( $images.length === loaded.length ) {
+			setTimeout( doneLoading );
+			$images.unbind( '.imagesLoaded', imgLoadedHandler );
+		}
+	}
+
+	// if no images, trigger immediately
+	if ( !$images.length ) {
+		doneLoading();
+	} else {
+		$images.bind( 'load.imagesLoaded error.imagesLoaded', imgLoadedHandler )
+		.each( function( i, el ) {
+			var src = el.src,
+
+			// find out if this image has been already checked for status
+			// if it was, and src has not changed, call imgLoaded on it
+			cached = $.data( el, 'imagesLoaded' );
+			if ( cached && cached.src === src ) {
+				imgLoaded( el, cached.isBroken );
+				return;
+			}
+
+			// if complete is true and browser supports natural sizes, try
+			// to check for image status manually
+			if ( el.complete && el.naturalWidth !== undefined ) {
+				imgLoaded( el, el.naturalWidth === 0 || el.naturalHeight === 0 );
+				return;
+			}
+
+			// cached images don't fire load sometimes, so we reset src, but only when
+			// dealing with IE, or image is complete (loaded) and failed manual check
+			// webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
+			if ( el.readyState || el.complete ) {
+				el.src = BLANK;
+				el.src = src;
+			}
+		});
+	}
+
+	return deferred ? deferred.promise( $this ) : $this;
+};
+
+})(jQuery);
