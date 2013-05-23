@@ -13,6 +13,5 @@
 	"browser": true,
 	"strict": true,
 	"camelcase": true,
-	"jquery": true,
-    "es5": true
+	"jquery": true
 }
