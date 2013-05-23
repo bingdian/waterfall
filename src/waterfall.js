@@ -5,8 +5,11 @@
  * Copyright (c) 2013 bingdian
  * Licensed under the MIT license.
  */
+/*global Handlebars: false */
 ;(function( $, window, document, undefined ) {
-    
+	
+    "use strict";
+	
     /*
      * defaults
      */
@@ -36,7 +39,7 @@
             dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
             
-            loadingMsg: '<div style="text-align:center;padding:10px 0 ;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // 加载提示，html
+            loadingMsg: '<div style="text-align:center;padding:10px 0; color:#999;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // 加载提示，html
             
             state: { 
                 isDuringAjax: false, 
@@ -87,7 +90,7 @@
                         template;
                         
                     if ( dataType === 'json' ||  dataType === 'jsonp'  ) { // json或jsonp格式
-                        tpl = $('#waterfall-tpl').html(),
+                        tpl = $('#waterfall-tpl').html();
                         template = Handlebars.compile(tpl);
                         
                         return template(data);
@@ -117,7 +120,7 @@
         constructor: 'Waterfall',
         
         // Console log wrapper
-        _debug: function infscr_debug() {
+        _debug: function () {
 			if ( true !== this.options.debug ) {
 				return;
 			}
@@ -142,8 +145,7 @@
          * @callback {Object Function } 当实例再次被触发时回调函数 -> $el.waterfall();
          */
         _init: function( callback ) {
-            var self = this,
-                options = this.options,
+            var options = this.options,
                 path = options.path;
                 
             if ( !path ) { // 没有提供api
@@ -233,11 +235,12 @@
          * 重置瀑布流各列高度数组
          */
         _resetColumnsHeightArray: function() {
-            var cols = this.cols;
+            var cols = this.cols,
+				i;
             
             this.colHeightArray.length = cols;
             
-            for (var i = 0; i < cols; i++) {
+            for (i = 0; i < cols; i++) {
                 this.colHeightArray[i] = 0;
             }
         },
@@ -254,7 +257,8 @@
                 len = this.colHeightArray.length,
                 align = options.align,
                 fixMarginLeft,
-                obj;
+                obj,
+				i, j, itemsLen, styleLen;
             
             //计算item的left margin
             if ( align === 'center' ) {
@@ -268,12 +272,12 @@
             
             
             // 设置数据块的位置样式
-            for (var i = 0, itemsLen = $items.length; i < itemsLen; i++) {
+            for (i = 0, itemsLen = $items.length; i < itemsLen; i++) {
                 this._placeItems( $items[i], fixMarginLeft);
             }
 
             // 应用数据块样式
-            for (var j= 0, styleLen = this.styleQueue.length; j < styleLen; j++) {
+            for (j= 0, styleLen = this.styleQueue.length; j < styleLen; j++) {
                 obj = this.styleQueue[j];
                 obj.$el[ styleFn ]( obj.style, animationOptions );
             }
