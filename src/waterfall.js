@@ -77,9 +77,10 @@
                 
                 /*
                  * ajax请求出错误
-                 * @param {String} xhr , end/failed
+                 * @param {String} xhr , "end" "error"
                  */
-                loadingError: function(xhr) {
+                loadingError: function($message, xhr) {
+					$message.html('Data load faild, please try again later.');
                 },
                 
                 /*
@@ -150,26 +151,27 @@
             var options = this.options,
                 path = options.path;
                 
-            if ( !path ) { // 没有提供api
-                this._debug('Invalid path');
-                return;
-            }
-            
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray(); // 设置瀑布流高度数组
             this._reLayout( callback ); // 对已有数据块重排
             
-            // auto prefill
+			if ( !path ) { // 没有提供api
+                this._debug('Invalid path');
+                return;
+            }
+			
+            // 当文档小于窗口可见区域，自动加载数据
             if ( options.isAutoPrefill ) {
 				this._prefill();
 			}
             
-            //绑定事件
+            // 绑定事件resize事件
             if ( options.resizable ) {
                 this._doResize();
             }
             
+			// 绑定事件scroll事件
             this._doScroll();
         },
         
@@ -182,10 +184,10 @@
                 
             //如果没有数据再插入div
             this.$element.css(this.options.containerStyle).addClass(prefix + '-container');
-            this.$element.after('<div id="' + prefix + '-loading">' +options.loadingMsg+ '</div>');
-            
-            this.$container = this.$element;
+            this.$element.after('<div id="' + prefix + '-loading">' +options.loadingMsg+ '</div><div id="' + prefix + '-message" style="text-align:center;color:#999;"></div>');
+			
             this.$loading = $('#' + prefix + '-loading');
+			this.$message = $('#' + prefix + '-message');
         },
         
 
@@ -261,16 +263,15 @@
                 obj,
 				i, j, itemsLen, styleLen;
             
-            //计算item的left margin
+            // 计算item的left position
             if ( align === 'center' ) {
-                fixMarginLeft = (this.$container.width() - (colWidth + gutterWidth) * len) /2;
+                fixMarginLeft = (this.$element.width() - (colWidth + gutterWidth) * len) /2;
                 fixMarginLeft = fixMarginLeft > 0 ? fixMarginLeft : 0;
             } else if ( align === 'left' ) {
                 fixMarginLeft = 0;
             } else if ( align === 'right' ) {
-                fixMarginLeft = this.$container.width() - (colWidth + gutterWidth) * len;
+                fixMarginLeft = this.$element.width() - (colWidth + gutterWidth) * len;
             }
-            
             
             // 设置数据块的位置样式
             for (i = 0, itemsLen = $items.length; i < itemsLen; i++) {
@@ -283,12 +284,11 @@
                 obj.$el[ styleFn ]( obj.style, animationOptions );
             }
             
-            // 瀑布流数据块排列完成设置$container高度
+            // 瀑布流数据块排列完成设置$container高度为瀑布流最大列高度
             this.$element.height(Math.max.apply({}, this.colHeightArray));
             
-            //清除队列
+            // 清除队列
             this.styleQueue = [];
-            
             
             // 更新排列完成状态
             this.options.state.isResizing = false;
@@ -316,7 +316,6 @@
                 gutterHeight = options.gutterHeight,
                 colHeightArray = this.colHeightArray,
                 len = colHeightArray.length,
-                //curColHeight,
                 minColHeight = Math.min.apply({}, colHeightArray),        //当前所有列中最小高度
                 minColIndex = $.inArray(minColHeight, colHeightArray),        //当前所有列中最小高度下标,
                 colIndex, // item要插入的列index
@@ -327,7 +326,7 @@
             if ( $item.hasClass(options.prefix + '-item-fixed-left')) {
                 colIndex = 0;
             } else if ( $item.hasClass(options.prefix + '-item-fixed-right') ) {
-                colIndex = len > 1 ? ( len - 1) : 0;
+                colIndex = ( len > 1 ) ? ( len - 1) : 0;
             } else {
                 colIndex = minColIndex;
             }
@@ -337,7 +336,6 @@
                 top: colHeightArray[colIndex]  // item要插入的列高度 
             };
 
-            
             //插入动画效果队列
             this.styleQueue.push({ $el: $item, style: position });
             
@@ -354,12 +352,12 @@
         _reLayout: function( callback ) {
             var $items = this._getItems(this.$element.find('.' + this.options.itemCls));
             
-            this._resetColumnsHeightArray(); //重置高度数组
+            this._resetColumnsHeightArray(); // 重置高度数组
             
             this.layout( $items, callback );
         },
         
-        
+
         addItems: function($items) {
         },
         
@@ -374,6 +372,7 @@
         
         destroy: function() {
         },
+		
         
         /**
          * 请求api数据
@@ -382,7 +381,7 @@
             var self = this,
                 options = this.options,
                 maxPage = options.maxPage,
-                curPage = options.state.curPage++, // increment
+                curPage = options.state.curPage++, // 当前请求数据页数
                 path = options.path,
                 dataType = options.dataType,
                 params = options.params,
@@ -398,7 +397,7 @@
             // 获取数据url
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
             
-			this._debug('heading into ajax', pageurl);
+			this._debug('heading into ajax', pageurl+$.param(params));
             
             // loading start
             options.callbacks.loadingStart(this.$loading);
@@ -414,6 +413,8 @@
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
                     var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
+					console.log(jqXHR.status);
+					
                     if ( condition ) {
                         // 模拟数据加载延迟
                         /*setTimeout(function() {
@@ -426,9 +427,10 @@
                     
                     self.options.state.isDuringAjax = false;
                 },
-                error: function() {
+                error: function(jqXHR) {
+					var status;
                     self._debug('ajax request failed.');
-                    self._responeseError('failed');
+                    self._responeseError('error');
                 }
             });
         },
@@ -474,10 +476,11 @@
          * _responeseError
          */
         _responeseError: function(xhr) {
-            
-            if (xhr === 'end' || xhr === 'failed' ) {
-                this.options.callbacks.loadingError(xhr);
-            } else {
+			
+            this.$loading.hide();
+			this.options.callbacks.loadingError(this.$message, xhr);
+			
+            if ( xhr !== 'end' || xhr !== 'error' ) {
                 xhr = 'unknown';
             }
             
