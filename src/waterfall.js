@@ -13,7 +13,8 @@
     /*
      * defaults
      */
-    var pluginName = 'waterfall',
+    var $window = $(window),
+        pluginName = 'waterfall',
         defaults = {
             itemCls: 'waterfall-item',  // 瀑布流数据块class
             prefix: 'waterfall', // 瀑布流元素前辍
@@ -503,7 +504,7 @@
         _nearbottom: function() {
             var options = this.options,
                 minColHeight = Math.min.apply({}, this.colHeightArray),
-                distanceFromWindowBottomToMinColBottom = $(window).scrollTop() + $(window).height() - this.$element.offset().top - minColHeight; // 窗口底部到瀑布流最小高度列的距离
+                distanceFromWindowBottomToMinColBottom = $window.scrollTop() + $window.height() - this.$element.offset().top - minColHeight; // 窗口底部到瀑布流最小高度列的距离
                 
             this._debug('math:', distanceFromWindowBottomToMinColBottom);
 
@@ -551,14 +552,14 @@
          */
         _doScroll: function() {
             var self = this,
-                timer;
+                scrollTimer;
             
-            $(window).bind('scroll', function() {
-                clearTimeout(timer);
-                timer = setTimeout(function() {
-                    self._debug('event', 'scroll ...');
+            $window.bind('scroll', function() {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(function() {
+                    self._debug('event', 'scrolling ...');
                     self._scroll();
-                }, 30);
+                }, 100);
             });
         },
         
@@ -588,13 +589,13 @@
          */
         _doResize: function() {
             var self = this,
-                timer;
+                resizeTimer;
 
-            $(window).bind('resize', function() {
-                clearTimeout(timer);
-                timer = setTimeout(function() {
+            $window.bind('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
                     self._resize();
-                }, 30); 
+                }, 100); 
             });
         }
     };
