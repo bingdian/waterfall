@@ -7,9 +7,9 @@
  */
 /*global Handlebars: false */
 ;(function( $, window, document, undefined ) {
-	
+    
     "use strict";
-	
+    
     /*
      * defaults
      */
@@ -80,7 +80,7 @@
                  * @param {String} xhr , "end" "error"
                  */
                 loadingError: function($message, xhr) {
-					$message.html('Data load faild, please try again later.');
+                    $message.html('Data load faild, please try again later.');
                 },
                 
                 /*
@@ -124,22 +124,22 @@
         
         // Console log wrapper
         _debug: function () {
-			if ( true !== this.options.debug ) {
-				return;
-			}
+            if ( true !== this.options.debug ) {
+                return;
+            }
 
-			if (typeof console !== 'undefined' && typeof console.log === 'function') {
-				// Modern browsers
-				// Single argument, which is a string
-				if ((Array.prototype.slice.call(arguments)).length === 1 && typeof Array.prototype.slice.call(arguments)[0] === 'string') {
-					console.log( (Array.prototype.slice.call(arguments)).toString() );
-				} else {
-					console.log( Array.prototype.slice.call(arguments) );
-				}
-			} else if (!Function.prototype.bind && typeof console !== 'undefined' && typeof console.log === 'object') {
-				// IE8
-				Function.prototype.call.call(console.log, console, Array.prototype.slice.call(arguments));
-			}
+            if (typeof console !== 'undefined' && typeof console.log === 'function') {
+                // Modern browsers
+                // Single argument, which is a string
+                if ((Array.prototype.slice.call(arguments)).length === 1 && typeof Array.prototype.slice.call(arguments)[0] === 'string') {
+                    console.log( (Array.prototype.slice.call(arguments)).toString() );
+                } else {
+                    console.log( Array.prototype.slice.call(arguments) );
+                }
+            } else if (!Function.prototype.bind && typeof console !== 'undefined' && typeof console.log === 'object') {
+                // IE8
+                Function.prototype.call.call(console.log, console, Array.prototype.slice.call(arguments));
+            }
         },
         
         
@@ -154,24 +154,24 @@
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray(); // 设置瀑布流高度数组
-            this._reLayout( callback ); // 对已有数据块重排
+            this.reLayout( callback ); // 对已有数据块重排
             
-			if ( !path ) { // 没有提供api
+            if ( !path ) { // 没有提供api
                 this._debug('Invalid path');
                 return;
             }
-			
+            
             // 当文档小于窗口可见区域，自动加载数据
             if ( options.isAutoPrefill ) {
-				this._prefill();
-			}
+                this._prefill();
+            }
             
             // 绑定事件resize事件
             if ( options.resizable ) {
                 this._doResize();
             }
             
-			// 绑定事件scroll事件
+            // 绑定事件scroll事件
             this._doScroll();
         },
         
@@ -185,9 +185,9 @@
             //如果没有数据再插入div
             this.$element.css(this.options.containerStyle).addClass(prefix + '-container');
             this.$element.after('<div id="' + prefix + '-loading">' +options.loadingMsg+ '</div><div id="' + prefix + '-message" style="text-align:center;color:#999;"></div>');
-			
+            
             this.$loading = $('#' + prefix + '-loading');
-			this.$message = $('#' + prefix + '-message');
+            this.$message = $('#' + prefix + '-message');
         },
         
 
@@ -239,7 +239,7 @@
          */
         _resetColumnsHeightArray: function() {
             var cols = this.cols,
-				i;
+                i;
             
             this.colHeightArray.length = cols;
             
@@ -251,8 +251,9 @@
         /*
          * 排列数据块
          */
-        layout: function($items, callback) {
+        layout: function($content, callback) {
             var options = this.options,
+				$items = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content),
                 styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css', // 数据块动画效果
                 animationOptions = options.animationOptions,
                 colWidth = options.colWidth,
@@ -262,6 +263,9 @@
                 fixMarginLeft,
                 obj,
 				i, j, itemsLen, styleLen;
+
+            // 处理后html插入瀑布流 
+            this.$element.append($items);
             
             // 计算item的left position
             if ( align === 'center' ) {
@@ -303,6 +307,19 @@
             }
         },
         
+        
+        /*
+         * 全部重排数据块
+         */
+        reLayout: function( callback ) {
+            var $content = this.$element.find('.' + this.options.itemCls);
+            
+            // 重置高度数组
+            this._resetColumnsHeightArray(); 
+            
+            // 重排
+            this.layout($content , callback );
+        },
         
         /*
          * 设置数据块的位置样式
@@ -347,32 +364,42 @@
         },
         
         /*
-         * 全部重排数据块
+         * prepend
+         * @param {Object} $content
+         * @param {Function} callback
          */
-        _reLayout: function( callback ) {
-            var $items = this._getItems(this.$element.find('.' + this.options.itemCls));
+        prepend: function($content, callback) {
+            this.$element.prepend($content);  
+            this.reLayout(callback); // prepend需要重排瀑布流数据块
+        },
+        
+        /*
+         * append
+         * @param {Object} $content
+         * @param {Function} callback
+         */
+        append: function($content, callback) {
+            this.$element.append($content);
+            this.layout($content, callback);
             
-            this._resetColumnsHeightArray(); // 重置高度数组
-            
-            this.layout( $items, callback );
         },
         
-
-        addItems: function($items) {
+        /*
+         * append
+         * @param {Object} $items
+         * @param {Function} callback
+         */
+        removeItems:function($items, callback ) {
+            this.$element.find($items).remove();
+            this.reLayout(callback);
         },
         
-        appended: function($items) {
-        },
-        
-        removeItems:function($items) {
-        },
-        
-        reLayout: function() {
+        option: function(options) {
         },
         
         destroy: function() {
         },
-		
+        
         
         /**
          * 请求api数据
@@ -397,7 +424,7 @@
             // 获取数据url
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
             
-			this._debug('heading into ajax', pageurl+$.param(params));
+            this._debug('heading into ajax', pageurl+$.param(params));
             
             // loading start
             options.callbacks.loadingStart(this.$loading);
@@ -413,8 +440,7 @@
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
                     var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
-					console.log(jqXHR.status);
-					
+                    
                     if ( condition ) {
                         // 模拟数据加载延迟
                         /*setTimeout(function() {
@@ -428,8 +454,6 @@
                     self.options.state.isDuringAjax = false;
                 },
                 error: function(jqXHR) {
-					var status;
-                    self._debug('ajax request failed.');
                     self._responeseError('error');
                 }
             });
@@ -446,29 +470,17 @@
                 options = this.options,
                 content = $.trim(options.callbacks.renderData(data, options.dataType)),//$.trim 去掉开头空格，以动态创建由 jQuery 对象包装的 DOM 元素
                 $content = $(content),
-                $newItems,
                 checkImagesLoaded = options.checkImagesLoaded;
             
-            function _handle() {
-                $newItems = self.options.isFadeIn ? self._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : self._getItems($content);
-                    
-                //处理后html插入瀑布流 
-                self.$element.append($newItems);
-                    
-                //排列瀑布流数据
-                self.layout($newItems, callback);
-                
-                //loading finished
-                self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
-            }
-            
             if ( !checkImagesLoaded ) { // 不需要检测图片是否加载完成
-                _handle();
+               self.append($content, callback);
             } else {
                 $content.imagesLoaded(function() { // 图片是否加载完成回调
-                    _handle();
+                    self.append($content, callback);
                 });
             }
+            
+            self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
         },
         
         /*
@@ -476,11 +488,11 @@
          * _responeseError
          */
         _responeseError: function(xhr) {
-			
+            
             this.$loading.hide();
-			this.options.callbacks.loadingError(this.$message, xhr);
-			
-            if ( xhr !== 'end' || xhr !== 'error' ) {
+            this.options.callbacks.loadingError(this.$message, xhr);
+            
+            if ( xhr !== 'end' && xhr !== 'error' ) {
                 xhr = 'unknown';
             }
             
@@ -506,8 +518,8 @@
         _prefill: function() {
             
             if ( this._nearbottom() ) {
-				this._scroll();
-			}
+                this._scroll();
+            }
 
         },
         
@@ -523,12 +535,12 @@
             // ajax数据正在请求还没有完成 return
             // 
             if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
-				return;
-			}
+                return;
+            }
             
             if ( !this._nearbottom() ) {
-				return;
-			}
+                return;
+            }
             
             this._requestData();
         },
@@ -566,7 +578,7 @@
                 this._debug('event', 'resizing ...');
                 this.options.state.isResizing = true;
                 this.cols = newCols; //更新列数
-                this._reLayout(); //重排数据
+                this.reLayout(); //重排数据
             }
         },
         
@@ -589,11 +601,34 @@
     
     
     $.fn[pluginName] = function(options) {
-        return this.each(function() {
-            if (!$.data(this, "plugin_" + pluginName)) {
-                $.data(this, "plugin_" + pluginName, new Waterfall(this, options));
-            }
-        });
+        if ( typeof options === 'string' ) { // plugin method
+            var args = Array.prototype.slice.call( arguments, 1 );
+            
+            this.each(function() {
+                var instance = $.data( this, "plugin_" + pluginName );
+                
+                if ( !instance ) {
+                    instance._debug('instance is not initialization');
+                    return;
+                }
+
+                if ( !$.isFunction( instance[options] ) || options.charAt(0) === "_" ) { // options不是一个公有的方法，return
+                    instance._debug( "no such method '" + options + "'" );
+                    return;
+                }
+                
+                //  apply method
+                instance[options].apply( instance, args );
+            });
+        } else { // new plugin
+            this.each(function() {
+                if ( !$.data(this, "plugin_" + pluginName) ) {
+                    $.data(this, "plugin_" + pluginName, new Waterfall(this, options));
+                }
+            });
+        }
+    
+        return this;
     };
     
 }( jQuery, window, document ));
@@ -613,111 +648,111 @@
 var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 $.fn.imagesLoaded = function( callback ) {
-	var $this = this,
-		deferred = $.isFunction($.Deferred) ? $.Deferred() : 0,
-		hasNotify = $.isFunction(deferred.notify),
-		$images = $this.find('img').add( $this.filter('img') ),
-		loaded = [],
-		proper = [],
-		broken = [];
+    var $this = this,
+        deferred = $.isFunction($.Deferred) ? $.Deferred() : 0,
+        hasNotify = $.isFunction(deferred.notify),
+        $images = $this.find('img').add( $this.filter('img') ),
+        loaded = [],
+        proper = [],
+        broken = [];
 
-	// Register deferred callbacks
-	if ($.isPlainObject(callback)) {
-		$.each(callback, function (key, value) {
-			if (key === 'callback') {
-				callback = value;
-			} else if (deferred) {
-				deferred[key](value);
-			}
-		});
-	}
+    // Register deferred callbacks
+    if ($.isPlainObject(callback)) {
+        $.each(callback, function (key, value) {
+            if (key === 'callback') {
+                callback = value;
+            } else if (deferred) {
+                deferred[key](value);
+            }
+        });
+    }
 
-	function doneLoading() {
-		var $proper = $(proper),
-			$broken = $(broken);
+    function doneLoading() {
+        var $proper = $(proper),
+            $broken = $(broken);
 
-		if ( deferred ) {
-			if ( broken.length ) {
-				deferred.reject( $images, $proper, $broken );
-			} else {
-				deferred.resolve( $images );
-			}
-		}
+        if ( deferred ) {
+            if ( broken.length ) {
+                deferred.reject( $images, $proper, $broken );
+            } else {
+                deferred.resolve( $images );
+            }
+        }
 
-		if ( $.isFunction( callback ) ) {
-			callback.call( $this, $images, $proper, $broken );
-		}
-	}
+        if ( $.isFunction( callback ) ) {
+            callback.call( $this, $images, $proper, $broken );
+        }
+    }
 
-	function imgLoadedHandler( event ) {
-		imgLoaded( event.target, event.type === 'error' );
-	}
+    function imgLoadedHandler( event ) {
+        imgLoaded( event.target, event.type === 'error' );
+    }
 
-	function imgLoaded( img, isBroken ) {
-		// don't proceed if BLANK image, or image is already loaded
-		if ( img.src === BLANK || $.inArray( img, loaded ) !== -1 ) {
-			return;
-		}
+    function imgLoaded( img, isBroken ) {
+        // don't proceed if BLANK image, or image is already loaded
+        if ( img.src === BLANK || $.inArray( img, loaded ) !== -1 ) {
+            return;
+        }
 
-		// store element in loaded images array
-		loaded.push( img );
+        // store element in loaded images array
+        loaded.push( img );
 
-		// keep track of broken and properly loaded images
-		if ( isBroken ) {
-			broken.push( img );
-		} else {
-			proper.push( img );
-		}
+        // keep track of broken and properly loaded images
+        if ( isBroken ) {
+            broken.push( img );
+        } else {
+            proper.push( img );
+        }
 
-		// cache image and its state for future calls
-		$.data( img, 'imagesLoaded', { isBroken: isBroken, src: img.src } );
+        // cache image and its state for future calls
+        $.data( img, 'imagesLoaded', { isBroken: isBroken, src: img.src } );
 
-		// trigger deferred progress method if present
-		if ( hasNotify ) {
-			deferred.notifyWith( $(img), [ isBroken, $images, $(proper), $(broken) ] );
-		}
+        // trigger deferred progress method if present
+        if ( hasNotify ) {
+            deferred.notifyWith( $(img), [ isBroken, $images, $(proper), $(broken) ] );
+        }
 
-		// call doneLoading and clean listeners if all images are loaded
-		if ( $images.length === loaded.length ) {
-			setTimeout( doneLoading );
-			$images.unbind( '.imagesLoaded', imgLoadedHandler );
-		}
-	}
+        // call doneLoading and clean listeners if all images are loaded
+        if ( $images.length === loaded.length ) {
+            setTimeout( doneLoading );
+            $images.unbind( '.imagesLoaded', imgLoadedHandler );
+        }
+    }
 
-	// if no images, trigger immediately
-	if ( !$images.length ) {
-		doneLoading();
-	} else {
-		$images.bind( 'load.imagesLoaded error.imagesLoaded', imgLoadedHandler )
-		.each( function( i, el ) {
-			var src = el.src,
+    // if no images, trigger immediately
+    if ( !$images.length ) {
+        doneLoading();
+    } else {
+        $images.bind( 'load.imagesLoaded error.imagesLoaded', imgLoadedHandler )
+        .each( function( i, el ) {
+            var src = el.src,
 
-			// find out if this image has been already checked for status
-			// if it was, and src has not changed, call imgLoaded on it
-			cached = $.data( el, 'imagesLoaded' );
-			if ( cached && cached.src === src ) {
-				imgLoaded( el, cached.isBroken );
-				return;
-			}
+            // find out if this image has been already checked for status
+            // if it was, and src has not changed, call imgLoaded on it
+            cached = $.data( el, 'imagesLoaded' );
+            if ( cached && cached.src === src ) {
+                imgLoaded( el, cached.isBroken );
+                return;
+            }
 
-			// if complete is true and browser supports natural sizes, try
-			// to check for image status manually
-			if ( el.complete && el.naturalWidth !== undefined ) {
-				imgLoaded( el, el.naturalWidth === 0 || el.naturalHeight === 0 );
-				return;
-			}
+            // if complete is true and browser supports natural sizes, try
+            // to check for image status manually
+            if ( el.complete && el.naturalWidth !== undefined ) {
+                imgLoaded( el, el.naturalWidth === 0 || el.naturalHeight === 0 );
+                return;
+            }
 
-			// cached images don't fire load sometimes, so we reset src, but only when
-			// dealing with IE, or image is complete (loaded) and failed manual check
-			// webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
-			if ( el.readyState || el.complete ) {
-				el.src = BLANK;
-				el.src = src;
-			}
-		});
-	}
+            // cached images don't fire load sometimes, so we reset src, but only when
+            // dealing with IE, or image is complete (loaded) and failed manual check
+            // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
+            if ( el.readyState || el.complete ) {
+                el.src = BLANK;
+                el.src = src;
+            }
+        });
+    }
 
-	return deferred ? deferred.promise( $this ) : $this;
+    return deferred ? deferred.promise( $this ) : $this;
 };
 
 })(jQuery);
