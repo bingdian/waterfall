@@ -386,7 +386,7 @@
         },
         
         /*
-         * append
+         * remove item
          * @param {Object} $items
          * @param {Function} callback
          */
@@ -395,12 +395,23 @@
             this.reLayout(callback);
         },
         
-        option: function(options) {
+        /*
+         * opts
+         * @param {Object} opts
+         * @param {Function} callback
+         */
+        option: function( opts, callback ){
+            if ( $.isPlainObject( opts ) ){
+                this.options = $.extend(true, this.options, opts);
+                
+                if ( callback )  {
+                    callback();
+                }
+                
+                // 重新初始化
+                this._init();
+            } 
         },
-        
-        destroy: function() {
-        },
-        
         
         /**
          * 请求api数据
