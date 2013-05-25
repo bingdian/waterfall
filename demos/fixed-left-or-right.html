@@ -10,7 +10,7 @@
 <div id="header">
     <h1>左侧或右侧固定列</h1>
 </div>
-<div id="waterfall">
+<div id="container">
     <div class="item waterfall-item-fixed-left" style="height: 180px;  background: #2b8af8; color: #fff;">left</div>
     <div class="item waterfall-item-fixed-right" style="height: 120px; background: #0293ab; color: #fff;">right</div>
     <div class="item waterfall-item-fixed-left" style="height: 230px; background: #db561d; color: #fff;">left</div>
@@ -27,7 +27,7 @@
 <script src="js/libs/handlebars/handlebars.js"></script>
 <script src="js/waterfall.min.js"></script>
 <script>
-$('#waterfall').waterfall({
+$('#container').waterfall({
     itemCls: 'item',
     colWidth: 222,  
     gutterWidth: 15,

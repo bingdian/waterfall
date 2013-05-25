@@ -10,7 +10,7 @@
 <div id="header">
     <h1>有限下拉数据完成后显示分页</h1>
 </div>
-<div id="waterfall"></div>
+<div id="container"></div>
 <div id="page-navigation" class="hide clear">
     <span class="disabled page-navigation-prev" title="上一页">«上一页</span>
     <a href="?&p=1" data-target="page" data-page="1" class="cur">1</a>
@@ -36,7 +36,7 @@
 <script src="js/libs/handlebars/handlebars.js"></script>
 <script src="js/waterfall.min.js"></script>
 <script>
-$('#waterfall').waterfall({
+$('#container').waterfall({
     itemCls: 'item',
     colWidth: 222,  
     gutterWidth: 15,
