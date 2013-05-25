@@ -24,7 +24,7 @@
   ],
   "dependencies": {
     "jquery": "*",
-    "handlebars": "*",
+    "handlebars": "*"
   },
   "keywords": []
 }
