@@ -1,11 +1,11 @@
 {
-  "name": "waterfall",
-  "title": "waterfall",
-  "description": "jquery waterfall plugin",
+  "name": "jquery waterfall",
+  "title": "jquery waterfall",
+  "description": "jquery waterfall plugin,like Pinterest",
   "version": "v0.1.0",
   "homepage": "http://wlog.cn/jquery/jquery-waterfall-plugin.html",
   "docs": "http://wlog.cn/jquery/jquery-waterfall-plugin.html",
-  "download": "https://github.com/bingdian/waterfall/archive/v0.1.0.tar.gz",
+  "download": "https://github.com/bingdian/waterfall/archive/0.1.0.tar.gz",
   "author": {
     "name": "bingdian",
     "email": "imbingdian@gmail.com",
