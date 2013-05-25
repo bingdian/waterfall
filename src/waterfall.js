@@ -8,7 +8,7 @@
 /*global Handlebars: false, console: false */
 ;(function( $, window, document, undefined ) {
     
-    "use strict";
+    'use strict';
     
     /*
      * defaults
@@ -20,8 +20,8 @@
             prefix: 'waterfall', // 瀑布流元素前辍
             fitWidth: true, // 是否自适应父元素宽度,false时，瀑布流宽度为当前元素宽度
             colWidth: 240,  // 瀑布流每列的宽度
-            gutterWidth: 0, // 数据块水平间距
-            gutterHeight: 0, // 数据块垂直间距
+            gutterWidth: 10, // 数据块水平间距
+            gutterHeight: 10, // 数据块垂直间距
             align: 'center', // 数据块相对于容器对齐方式，'align', 'left', 'right'
             minCol: 1,  // 数据块最小列数
             maxCol: undefined, // 数据块最多显示列数,默认undefined，最大列数无限制
@@ -37,7 +37,7 @@
             },
             isAutoPrefill: true,  // 当文档小于窗口可见区域，自动加载数据
             checkImagesLoaded: true, // 是否图片加载完成后开始排列数据块。如果直接后台输出图片尺寸，可设置为false
-            path: undefined, // 瀑布流数据分页url，可以是数组如["/popular/page/", "/"] => "/popular/page/1/"，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
+            path: undefined, // 瀑布流数据分页url，可以是数组如["/popular/page/", "/"] => "/popular/page/1/"，或者是根据分页返回一个url方法如：function(page) { return '/populr/page/' + page; } => "/popular/page/1/"
             dataType: 'json', //json, jsonp, html
             params: {}, //瀑布流数据请求参数
             
@@ -117,6 +117,7 @@
         this.styleQueue = []; 
         
         this._init();
+        console.log(this);
     }
     
     
@@ -571,7 +572,7 @@
             $window.bind('scroll', function() {
                 clearTimeout(scrollTimer);
                 scrollTimer = setTimeout(function() {
-                    self._debug('event', 'scrolling ...');
+                    //self._debug('event', 'scrolling ...');
                     self._scroll();
                 }, 100);
             });
@@ -590,7 +591,7 @@
             //瀑布流数据块居中对齐resize
             
             if ( newCols !== cols || this.options.align !== 'left' ) {
-                this._debug('event', 'resizing ...');
+                //this._debug('event', 'resizing ...');
                 this.options.state.isResizing = true;
                 this.cols = newCols; //更新列数
                 this.reLayout(); //重排数据
@@ -621,15 +622,15 @@
             var args = Array.prototype.slice.call( arguments, 1 );
             
             this.each(function() {
-                var instance = $.data( this, "plugin_" + pluginName );
+                var instance = $.data( this, 'plugin_' + pluginName );
                 
                 if ( !instance ) {
                     instance._debug('instance is not initialization');
                     return;
                 }
 
-                if ( !$.isFunction( instance[options] ) || options.charAt(0) === "_" ) { // options不是一个公有的方法，return
-                    instance._debug( "no such method '" + options + "'" );
+                if ( !$.isFunction( instance[options] ) || options.charAt(0) === '_' ) { // options不是一个公有的方法，return
+                    instance._debug( 'no such method "' + options + '"' );
                     return;
                 }
                 
@@ -638,8 +639,8 @@
             });
         } else { // new plugin
             this.each(function() {
-                if ( !$.data(this, "plugin_" + pluginName) ) {
-                    $.data(this, "plugin_" + pluginName, new Waterfall(this, options));
+                if ( !$.data(this, 'plugin_' + pluginName) ) {
+                    $.data(this, 'plugin_' + pluginName, new Waterfall(this, options));
                 }
             });
         }
