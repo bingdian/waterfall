@@ -537,7 +537,8 @@
          */
         _scroll: function() {
             var options = this.options,
-                state = options.state;
+                state = options.state,
+                self = this;
             
             
             // state.isProcessingData 数据还没有处理完成 return
@@ -551,7 +552,12 @@
                 return;
             }
             
-            this._requestData();
+            this._requestData(function() {
+                // 数据请求并排列完成后，如果还没有填满页面，继续执行_scroll()
+                var timer = setTimeout(function() {
+                    self._scroll();
+                }, 100);
+            });
         },
         
         
@@ -588,6 +594,7 @@
                 this.options.state.isResizing = true;
                 this.cols = newCols; //更新列数
                 this.reLayout(); //重排数据
+                this._prefill(); //resize后需要判断是否需要填充新的内容
             }
         },
         
