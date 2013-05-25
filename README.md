@@ -1,6 +1,6 @@
 # Waterfall
 
-瀑布布局插件, 类似于 [Pinterest](http://pinterest.com/)、[花瓣](http://huaban.com/)、[发现啦](http://faxianla.com/)。
+瀑布流布局插件, 类似于 [Pinterest](http://pinterest.com/)、[花瓣](http://huaban.com/)、[发现啦](http://faxianla.com/)。
 
 ## 文档
 
