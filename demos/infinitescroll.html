@@ -8,7 +8,7 @@
 </head>
 <body>
 <div id="header">
-    <h1>simple waterfall demo</h1>
+    <h1>无限数据下拉</h1>
 </div>
 <div id="waterfall"></div>
 <script type="text/x-handlebars-template" id="waterfall-tpl">
@@ -27,13 +27,9 @@ $('#waterfall').waterfall({
     colWidth: 222,  
     gutterWidth: 15,
     gutterHeight: 15,
+    checkImagesLoaded: false,
     path: function(page) {
         return 'data/data1.json?page=' + page;
-    },
-    params: {
-        type: 'popular',
-        start: 10000,
-        perPage: 20
     }
 });
 </script>

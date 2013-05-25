@@ -8,9 +8,10 @@
 </head>
 <body>
 <div id="header">
-    <h1>simple waterfall demo</h1>
+    <h1>resize动画效果</h1>
 </div>
 <div id="waterfall"></div>
+
 <script type="text/x-handlebars-template" id="waterfall-tpl">
 {{#result}}
     <div class="item">
@@ -25,21 +26,14 @@
 <script>
 $('#waterfall').waterfall({
     itemCls: 'item',
-    colWidth: 222,  
+    colWidth: 222,
     gutterWidth: 15,
     gutterHeight: 15,
     isAnimated: true,
     animationOptions: {
-        easing: 'easeInCubic',
-        duration: 300,
     },
     path: function(page) {
         return 'data/data1.json?page=' + page;
-    },
-    params: {
-        type: 'popular',
-        start: 10000,
-        perPage: 20
     }
 });
 </script>

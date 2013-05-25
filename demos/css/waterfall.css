@@ -14,6 +14,7 @@ a:hover {
     position: relative;
     z-index: 99997;
     height: 38px;
+	padding: 0 30px;
     margin-bottom: 20px;
     border-bottom: 1px solid #e0dede;
     background-color: #f7f7f7;
@@ -34,10 +35,6 @@ a:hover {
 /*
  * waterfall
  */
-.waterfall-with-width {
-	width: 1000px;
-	margin: 0 auto;
-}
 .item {
     position: absolute;
     top: 0;

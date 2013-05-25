@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>jsonp格式</title>
+    <title>ajax加载jsonp格式</title>
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/waterfall.css">
 <style>
@@ -11,7 +11,7 @@
 </head>
 <body>
 <div id="header">
-    <h1>simple waterfall demo</h1>
+    <h1>ajax加载jsonp格式</h1>
 </div>
 <div id="waterfall"></div>
 <script type="text/x-handlebars-template" id="waterfall-tpl">
@@ -38,7 +38,6 @@ $('#waterfall').waterfall({
     dataType: "jsonp",
     jsonpCallback: "jsoncallback",
     params: {
-        
         'method': 'flickr.photos.search',
         'api_key': 'f290d9d56bd82fde0c87d7fd6a0e6c33',
         'tags': 'travel',

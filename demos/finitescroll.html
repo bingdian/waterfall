@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>有限下拉数据完成后显示分页</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+</head>
+<body>
+<div id="header">
+    <h1>有限下拉数据完成后显示分页</h1>
+</div>
+<div id="waterfall"></div>
+<div id="page-navigation" class="hide clear">
+    <span class="disabled page-navigation-prev" title="上一页">«上一页</span>
+    <a href="?&p=1" data-target="page" data-page="1" class="cur">1</a>
+    <a href="?&p=2" data-target="page" data-page="2">2</a>
+    <a href="?&p=3" data-target="page" data-page="3">3</a>
+    <a href="?&p=4" data-target="page" data-page="4">4</a>
+    <a href="?&p=5" data-target="page" data-page="5">5</a>
+    <a href="?&p=6" data-target="page" data-page="6">6</a>
+    <a href="?&p=7" data-target="page" data-page="7">7</a>
+    <a href="?&p=8" data-target="page" data-page="8">8</a>
+    <a href="?&p=9" data-target="page" data-page="9">9</a>
+    <a href="?&p=10" data-target="page" data-page="10">10</a>
+    <a href="?&p=2" class="page-navigation-next"  data-page="2" title="下一页">下一页»</a>
+</div><!-- #page-navigation -->
+<script type="text/x-handlebars-template" id="waterfall-tpl">
+{{#result}}
+    <div class="item">
+        <img src="{{image}}" width="{{width}}" height="{{height}}" />
+    </div>
+{{/result}}
+</script>
+<script src="../libs/jquery/jquery.js"></script>
+<script src="../libs/handlebars/handlebars.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#waterfall').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    maxPage: 5,
+    callbacks: {
+        loadingFinished: function($loading, isBeyondMaxPage) {
+            if ( !isBeyondMaxPage ) {
+                $loading.fadeOut();
+            } else {
+                $loading.hide();
+                $('#page-navigation').show();
+            }
+        }
+    },
+    path: function(page) {
+        return 'data/data' + page + '.json';
+    }
+});
+</script>
+</body>
+</html>
