@@ -32,6 +32,18 @@ module.exports = function(grunt) {
         dest: 'build/<%= pkg.name %>.min.js'
       },
     },
+    copy: {
+        demos: {
+            files: [
+                
+                {src: ['libs/jquery/*'], dest: 'demos/js/'},
+                {expand: true, src: ['libs/handlebars/*'], dest: 'demos/js/'},
+                {expand: true, src: ['libs/mustache/*'], dest: 'demos/js/'},
+                {expand: true, src: ['libs/jquery.easing.js'], dest: 'demos/js/'},
+                {expand: true, cwd: 'build/',  src: ['**'], dest: 'demos/js/'}
+            ]
+        }
+    },
     jshint: {
       gruntfile: {
         options: {
@@ -65,8 +77,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify', 'copy']);
 
 };
