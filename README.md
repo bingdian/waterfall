@@ -143,9 +143,6 @@ script:
         <td>true</td>
         <td>当文档小于窗口可见区域，自动加载数据</td>
     </tr>
-            : , // 瀑布流数据分页url，可以是数组如["/popular/page/", "/"] => "/popular/page/1/"，或者是根据分页返回一个url方法如：function(page) { return '/populr/' + page; }
-            dataType: 'json', //json, jsonp, html
-            params: {}, //瀑布流数据请求参数
     <tr>
         <td>checkImagesLoaded</td>
         <td>Boolean</td>
