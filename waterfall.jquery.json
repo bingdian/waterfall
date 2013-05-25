@@ -4,6 +4,8 @@
   "description": "jquery waterfall plugin",
   "version": "0.1.0",
   "homepage": "http://wlog.cn/jquery/jquery-waterfall-plugin.html",
+  "docs": "http://wlog.cn/jquery/jquery-waterfall-plugin.html",
+  "download": "https://github.com/bingdian/waterfall/archive/v0.1.0.tar.gz",
   "author": {
     "name": "bingdian",
     "email": "imbingdian@gmail.com",
@@ -21,7 +23,8 @@
     }
   ],
   "dependencies": {
-    "jquery": "*"
+    "jquery": "*",
+    "handlebars": "*",
   },
   "keywords": []
 }
