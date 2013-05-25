@@ -1,9 +1,9 @@
 {
   "name": "waterfall",
-  "title": "Waterfall",
-  "description": "瀑布布局组件",
+  "title": "waterfall",
+  "description": "jquery waterfall plugin",
   "version": "0.1.0",
-  "homepage": "http://wlog.cn/athena/waterfall/",
+  "homepage": "http://wlog.cn/waterfall/",
   "author": {
     "name": "bingdian",
     "email": "imbingdian@gmail.com",
@@ -17,7 +17,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://wlog.cn/athena/waterfall//blob/master/LICENSE-MIT"
+      "url": "https://raw.github.com/bingdian/waterfall/master/LICENSE-MIT"
     }
   ],
   "dependencies": {
