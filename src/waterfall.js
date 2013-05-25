@@ -299,9 +299,6 @@
             this.options.state.isResizing = false;
             this.options.state.isProcessingData = false;
             
-            // 数据排玩完成不足一屏再次填充数据
-            //this._scroll();
-            
             // callback
             if ( callback ) {
                 callback.call( $items );
@@ -382,7 +379,6 @@
         append: function($content, callback) {
             this.$element.append($content);
             this.layout($content, callback);
-            
         },
         
         /*
@@ -486,13 +482,15 @@
             
             if ( !checkImagesLoaded ) { // 不需要检测图片是否加载完成
                self.append($content, callback);
+               self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
             } else {
-                $content.imagesLoaded(function() { // 图片是否加载完成回调
+                $content.imagesLoaded(function() { // 图片是否加载完成回调,当网络比较慢的时候需要等待很长时间
                     self.append($content, callback);
+                    self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
                 });
             }
             
-            self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
+            
         },
         
         /*
@@ -528,11 +526,9 @@
          * 预填充数据
          */
         _prefill: function() {
-            
-            if ( this._nearbottom() ) {
+            if ( this.$element.height() <= $window.height() ) {
                 this._scroll();
             }
-
         },
         
         /*
@@ -543,10 +539,11 @@
             var options = this.options,
                 state = options.state;
             
+            
             // state.isProcessingData 数据还没有处理完成 return
             // ajax数据正在请求还没有完成 return
             // 
-            if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage || state.isDone || state.isDestroyed || state.isPaused) {
+            if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage ) {
                 return;
             }
             
