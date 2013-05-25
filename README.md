@@ -265,7 +265,7 @@ callbacks:
  
  * [无限下拉数据](http://wlog.cn/demo/waterfall/infinitescroll.html)
  * [有限下拉数据完成后显示分页](http://wlog.cn/demo/waterfall/finitescroll.html)
- * [自定义瀑布流宽度](http://wlog.cn/demo/waterfall/custom-width.html)
+ * [瀑布流固定宽度](http://wlog.cn/demo/waterfall/custom-width.html)
  * [自定义最大列最小列](http://wlog.cn/demo/waterfall/min-max-columns.html)
  * [resize动画效果](http://wlog.cn/demo/waterfall/animate.html)
  * [加载数据时fadeIn效果](http://wlog.cn/demo/waterfall/fadein.html)
