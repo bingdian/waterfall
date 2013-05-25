@@ -5,7 +5,7 @@
  * Copyright (c) 2013 bingdian
  * Licensed under the MIT license.
  */
-/*global Handlebars: false */
+/*global Handlebars: false, console: false */
 ;(function( $, window, document, undefined ) {
     
     "use strict";

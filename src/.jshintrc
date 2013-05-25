@@ -1,0 +1,18 @@
+{
+	"curly": true,
+	"eqeqeq": true,
+	"eqnull": true,
+	"forin": true,
+	"immed": true,
+	"newcap": true,
+	"noarg": true,
+	"nonew": true,
+	"onevar": true,
+	"undef": true,
+	"boss": true,
+	"browser": true,
+	"strict": true,
+	"camelcase": true,
+    "devel": true,
+	"jquery": true
+}
