@@ -6,7 +6,7 @@
 
 ### 下载
 
-下载[waterfall插件](https://github.com/bingdian/waterfall/archive/1.0.0.tar.gz)最新版本。
+下载[waterfall插件](https://github.com/bingdian/waterfall/archive/master.tar.gz)最新版本。
 
 ### 使用
 
