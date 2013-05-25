@@ -64,7 +64,6 @@ script:
         <td>240</td>
         <td>瀑布流每列的宽度</td>
     </tr>
-            : , // 
     <tr>
         <td>gutterWidth</td>
         <td>Integer</td>
