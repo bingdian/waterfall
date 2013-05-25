@@ -206,13 +206,13 @@
                 maxCol = options.maxCol,
                 cols = Math.floor(containerWidth / (colWidth + gutterWidth)),
                 col = Math.max(cols, minCol );
-            /*
-            if ( !maxCol ) {
+            
+            /*if ( !maxCol ) {
                 return col;
             } else {
                 return col > maxCol ? maxCol : col;
             }*/
-            return maxCol ? col : (col > maxCol ? maxCol : col);
+            return !maxCol ? col : (col > maxCol ? maxCol : col);
         },
         
         
