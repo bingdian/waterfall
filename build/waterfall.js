@@ -104,7 +104,7 @@
                 }
             },
             
-            debug: true
+            debug: false
         };
     
     /*
