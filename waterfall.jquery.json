@@ -2,9 +2,9 @@
   "name": "waterfall",
   "title": "waterfall",
   "description": "jquery waterfall plugin,like Pinterest",
-  "version": "0.1.1",
-  "homepage": "http://wlog.cn/jquery/jquery-waterfall-plugin.html",
-  "docs": "http://wlog.cn/jquery/jquery-waterfall-plugin.html",
+  "version": "0.1.2",
+  "homepage": "http://wlog.cn/waterfall/",
+  "docs": "http://wlog.cn/waterfall/",
   "author": {
     "name": "bingdian",
     "email": "imbingdian@gmail.com",
