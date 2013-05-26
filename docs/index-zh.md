@@ -180,6 +180,12 @@ script:
         <td>见下面代码</td>
         <td>callback</td>
     </tr>
+    <tr>
+        <td>debug</td>
+        <td>Boolean</td>
+        <td>false</td>
+        <td>开启debug</td>
+    </tr>
 </table>
 
 loadingMsg:

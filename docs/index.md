@@ -177,6 +177,12 @@ script:
         <td></td>
         <td>callback</td>
     </tr>
+    <tr>
+        <td>debug</td>
+        <td>Boolean</td>
+        <td>false</td>
+        <td>enable debug</td>
+    </tr>
 </table>
 
 loadingMsg:
