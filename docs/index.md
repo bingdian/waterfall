@@ -13,8 +13,6 @@ Download the latest [waterfall plugin](https://github.com/bingdian/waterfall/arc
 Markup:
 
     <div id="container"></div>
-    
-引入jquery，handlebars和waterfall(注：waterfall默认返回json格式数据并使用[handlebars](http://handlebarsjs.com/)模板渲染json数据，你也可以在options中配置使用其它javascript模板如[mustache](http://mustache.github.com/)解析json数据或者直接返回html):
 
 Add jQuery, [handlebars](http://handlebarsjs.com/) and the Waterfall script. (You can also use other javascript template,see [demo](http://wlog.cn/demo/waterfall/mustache.html))
 
