@@ -1,10 +1,8 @@
 a:link, a:visited {
     color: #333;
-    text-decoration: none;
 }
 a:hover {
     color: #c30;
-    text-decoration: none;
 }
 
 /*
@@ -59,7 +57,10 @@ a:hover {
     filter: progid:DXImageTransform.Microsoft.Shadow(color = #979797, direction = 135, strength = 3);
 }
 
-
+#trigger {
+	padding: 10px 30px 20px 30px;
+}
+#trigger a { margin-right: 30px;}
 
 /*
  * page-navigation
