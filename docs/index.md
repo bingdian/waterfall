@@ -268,7 +268,7 @@ callbacks:
  * [min-max-columns](http://wlog.cn/demo/waterfall/min-max-columns.html)
  * [resize animate](http://wlog.cn/demo/waterfall/animate.html)
  * [fadeIn](http://wlog.cn/demo/waterfall/fadein.html)
- * [fixed brick left or right](http://wlog.cn/demo/waterfall/fixed-left-or-right.html)
+ * [fix brick left or right](http://wlog.cn/demo/waterfall/fixed-left-or-right.html)
  * [use mustache template](http://wlog.cn/demo/waterfall/mustache.html)
  * [html datatype](http://wlog.cn/demo/waterfall/html.html)
  * [jsonp datatype](http://wlog.cn/demo/waterfall/jsonp.html)
