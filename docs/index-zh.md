@@ -281,3 +281,4 @@ callbacks:
  * [使用其它模板如mustache解析json数据](http://wlog.cn/demo/waterfall/mustache.html)
  * [ajax加载html格式](http://wlog.cn/demo/waterfall/html.html)
  * [ajax加载jsonp格式](http://wlog.cn/demo/waterfall/jsonp.html)
+ * [methods](http://wlog.cn/demo/waterfall/methods.html)
