@@ -117,7 +117,6 @@
         this.styleQueue = []; 
         
         this._init();
-        console.log(this);
     }
     
     
