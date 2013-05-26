@@ -2,6 +2,8 @@
 
 瀑布流布局插件, 类似于 [Pinterest](http://pinterest.com/)、[花瓣](http://huaban.com/)、[发现啦](http://faxianla.com/)。
 
+[En](index.html) [中文](index-zh.html)
+
 ## 文档
 
 ### 下载
