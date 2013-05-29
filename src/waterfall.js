@@ -440,14 +440,7 @@
                 data: params,
                 dataType: dataType,
                 success: function(data, textStatus, jqXHR) {
-                    var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
-                    
-                    if ( condition ) {
-                        self._handleResponse(data, callback);
-                    } else {
-                        self._responeseError('end');
-                    }
-                    
+                    self._handleResponse(data, callback);
                     self.options.state.isDuringAjax = false;
                 },
                 error: function(jqXHR) {
