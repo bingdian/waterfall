@@ -439,15 +439,8 @@
                 url: pageurl,
                 data: params,
                 dataType: dataType,
-                success: function(data, textStatus, jqXHR) {
-                    var condition = (typeof (jqXHR.isResolved) !== 'undefined') ? (jqXHR.isResolved()) : (textStatus === "success" || textStatus === "notmodified");
-                    
-                    if ( condition ) {
-                        self._handleResponse(data, callback);
-                    } else {
-                        self._responeseError('end');
-                    }
-                    
+                success: function(data) {
+                    self._handleResponse(data, callback);
                     self.options.state.isDuringAjax = false;
                 },
                 error: function(jqXHR) {
@@ -549,7 +542,10 @@
                 scrollTimer;
             
             $window.bind('scroll', function() {
-                clearTimeout(scrollTimer);
+                if ( scrollTimer ) {
+                    clearTimeout(scrollTimer);
+                }
+
                 scrollTimer = setTimeout(function() {
                     //self._debug('event', 'scrolling ...');
                     self._scroll();
@@ -584,7 +580,10 @@
                 resizeTimer;
 
             $window.bind('resize', function() {
-                clearTimeout(resizeTimer);
+                if ( resizeTimer ) {
+                    clearTimeout(resizeTimer);
+                }
+                
                 resizeTimer = setTimeout(function() {
                     self._resize();
                 }, 100); 
