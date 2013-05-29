@@ -357,8 +357,8 @@
             //更新colHeightArray高度
             colHeightArray[colIndex] += $item.outerHeight() + gutterHeight;
             
-            //item添加class
-            $item.attr('data-col', colIndex);
+            //item添加data-col
+            //$item.attr('data-col', colIndex);
         },
         
         /*
