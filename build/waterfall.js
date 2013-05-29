@@ -1,13 +1,6 @@
 /*! waterfall - v0.1.3 - 2013-05-30
 * http://wlog.cn/waterfall/
 * Copyright (c) 2013 bingdian; Licensed MIT */
-/*!
- * waterfall
- * http://wlog.cn/waterfall/
- *
- * Copyright (c) 2013 bingdian
- * Licensed under the MIT license.
- */
 /*global Handlebars: false, console: false */
 ;(function( $, window, document, undefined ) {
     
