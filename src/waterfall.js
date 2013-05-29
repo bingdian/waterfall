@@ -439,7 +439,7 @@
                 url: pageurl,
                 data: params,
                 dataType: dataType,
-                success: function(data, textStatus, jqXHR) {
+                success: function(data) {
                     self._handleResponse(data, callback);
                     self.options.state.isDuringAjax = false;
                 },
