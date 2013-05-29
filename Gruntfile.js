@@ -17,6 +17,7 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
+        banner: '<%= banner %>'
       },
       dist: {
         src: ['src/<%= pkg.name %>.js'],
