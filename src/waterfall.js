@@ -542,7 +542,10 @@
                 scrollTimer;
             
             $window.bind('scroll', function() {
-                clearTimeout(scrollTimer);
+                if ( scrollTimer ) {
+                    clearTimeout(scrollTimer);
+                }
+
                 scrollTimer = setTimeout(function() {
                     //self._debug('event', 'scrolling ...');
                     self._scroll();
@@ -577,7 +580,10 @@
                 resizeTimer;
 
             $window.bind('resize', function() {
-                clearTimeout(resizeTimer);
+                if ( resizeTimer ) {
+                    clearTimeout(resizeTimer);
+                }
+                
                 resizeTimer = setTimeout(function() {
                     self._resize();
                 }, 100); 
