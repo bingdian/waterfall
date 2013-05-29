@@ -42,6 +42,7 @@ $('#container').waterfall({
     gutterWidth: 15,
     gutterHeight: 15,
     maxPage: 5,
+    checkImagesLoaded: false,
     callbacks: {
         loadingFinished: function($loading, isBeyondMaxPage) {
             if ( !isBeyondMaxPage ) {
