@@ -182,7 +182,13 @@
         _initContainer: function() {
             var options = this.options,
                 prefix = options.prefix;
-                
+            
+            // fix fixMarginLeft bug
+            $('body').css({
+                overflow: 'scroll'
+            });
+            
+            
             this.$element.css(this.options.containerStyle).addClass(prefix + '-container');
             this.$element.after('<div id="' + prefix + '-loading">' +options.loadingMsg+ '</div><div id="' + prefix + '-message" style="text-align:center;color:#999;"></div>');
             
