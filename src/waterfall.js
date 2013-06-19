@@ -267,14 +267,14 @@
             // append $items
             this.$element.append($items);
             
-            // 
+            // fixMarginLeft
             if ( align === 'center' ) {
-                fixMarginLeft = (this.$element.width() - (colWidth + gutterWidth) * len) /2;
+                fixMarginLeft = (this.$element.width() - colWidth * len  - gutterWidth * (len - 1) ) /2;
                 fixMarginLeft = fixMarginLeft > 0 ? fixMarginLeft : 0;
             } else if ( align === 'left' ) {
                 fixMarginLeft = 0;
             } else if ( align === 'right' ) {
-                fixMarginLeft = this.$element.width() - (colWidth + gutterWidth) * len;
+                fixMarginLeft = this.$element.width() - colWidth * len  - gutterWidth * (len - 1);
             }
             
             // place items
