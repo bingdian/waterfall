@@ -401,7 +401,7 @@
             if ( $.isPlainObject( opts ) ){
                 this.options = $.extend(true, this.options, opts);
                 
-                if ( callback )  {
+                if ( typeof callback === 'function' ) {
                     callback();
                 }
                 
@@ -413,17 +413,24 @@
         /*
          * prevent ajax request
          */
-        pause: function() {
+        pause: function(callback) {
             this.options.state.isPause = true;
-            console.log(this);
+            
+            if ( typeof callback === 'function' ) {
+                callback();
+            }
         },
         
 
         /*
          * resume ajax request
          */
-        resume: function() {
+        resume: function(callback) {
             this.options.state.isPause = false;
+            
+            if ( typeof callback === 'function' ) {
+                callback();
+            }
         },
         
         /**
