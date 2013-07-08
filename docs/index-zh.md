@@ -357,6 +357,14 @@ callbacks:
 
     $('#container').waterfalll('reLayout', $content, callback);
 
+**pause**
+
+    $('#container').waterfalll('pause', callback);
+    
+**resume**
+
+    $('#container').waterfalll('resume', callback);
+
 **option**
     
     $('#container').waterfalll('option', options, callback);
