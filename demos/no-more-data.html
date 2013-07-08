@@ -34,7 +34,7 @@
 </script>
 <script src="js/libs/jquery/jquery.js"></script>
 <script src="js/libs/handlebars/handlebars.js"></script>
-<script src="../src/waterfall.js"></script>
+<script src="js/waterfall.min.js"></script>
 <script>
 $('#container').waterfall({
     itemCls: 'item',
@@ -60,7 +60,8 @@ $('#container').waterfall({
                 
             if ( resultNum < 20) {
                 $('#container').waterfall('pause', function() {
-                    alert('no more data');
+                    $('#waterfall-message').html('<p style="color:#666;">no more data...</p>')
+                    //alert('no more data');
                 });
             }
     

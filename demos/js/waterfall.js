@@ -1,4 +1,4 @@
-/*! waterfall - v0.1.4 - 2013-06-19
+/*! waterfall - v0.1.4 - 2013-07-08
 * http://wlog.cn/waterfall/
 * Copyright (c) 2013 bingdian; Licensed MIT */
 /*global Handlebars: false, console: false */
@@ -39,10 +39,11 @@
             
             loadingMsg: '<div style="text-align:center;padding:10px 0; color:#999;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // loading html
             
-            state: { 
+            state: {
                 isDuringAjax: false, 
                 isProcessingData: false, 
                 isResizing: false,
+                isPause: false,
                 curPage: 1 // cur page
             },
 
@@ -255,7 +256,7 @@
          */
         layout: function($content, callback) {
             var options = this.options,
-				$items = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content),
+            $items = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content),
                 styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css', 
                 animationOptions = options.animationOptions,
                 colWidth = options.colWidth,
@@ -264,7 +265,7 @@
                 align = options.align,
                 fixMarginLeft,
                 obj,
-				i, j, itemsLen, styleLen;
+                i, j, itemsLen, styleLen;
 
             // append $items
             this.$element.append($items);
@@ -396,13 +397,36 @@
             if ( $.isPlainObject( opts ) ){
                 this.options = $.extend(true, this.options, opts);
                 
-                if ( callback )  {
+                if ( typeof callback === 'function' ) {
                     callback();
                 }
                 
                 // re init
                 this._init();
             } 
+        },
+        
+        /*
+         * prevent ajax request
+         */
+        pause: function(callback) {
+            this.options.state.isPause = true;
+            
+            if ( typeof callback === 'function' ) {
+                callback();
+            }
+        },
+        
+
+        /*
+         * resume ajax request
+         */
+        resume: function(callback) {
+            this.options.state.isPause = false;
+            
+            if ( typeof callback === 'function' ) {
+                callback();
+            }
         },
         
         /**
@@ -520,7 +544,7 @@
                 state = options.state,
                 self = this;
 
-            if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage ) {
+            if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage || state.isPause ) {
                 return;
             }
             
