@@ -378,4 +378,5 @@ callbacks:
  * [use mustache template](http://wlog.cn/demo/waterfall/mustache.html)
  * [html datatype](http://wlog.cn/demo/waterfall/html.html)
  * [jsonp datatype](http://wlog.cn/demo/waterfall/jsonp.html)
+ * [no more data](http://wlog.cn/demo/waterfall/no-more-data.html)
  * [methods](http://wlog.cn/demo/waterfall/methods.html)
