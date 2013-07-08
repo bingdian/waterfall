@@ -1,4 +1,4 @@
-/*! waterfall - v0.1.4 - 2013-07-08
+/*! waterfall - v0.1.5 - 2013-07-08
 * http://wlog.cn/waterfall/
 * Copyright (c) 2013 bingdian; Licensed MIT */
 /*global Handlebars: false, console: false */
