@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>finitescroll</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/waterfall.css">
+</head>
+<body>
+<div id="header">
+    <h1>no more data</h1>
+</div>
+<div id="container"></div>
+<div id="page-navigation" class="hide clear">
+    <span class="disabled page-navigation-prev" title="上一页">«上一页</span>
+    <a href="?&p=1" data-target="page" data-page="1" class="cur">1</a>
+    <a href="?&p=2" data-target="page" data-page="2">2</a>
+    <a href="?&p=3" data-target="page" data-page="3">3</a>
+    <a href="?&p=4" data-target="page" data-page="4">4</a>
+    <a href="?&p=5" data-target="page" data-page="5">5</a>
+    <a href="?&p=6" data-target="page" data-page="6">6</a>
+    <a href="?&p=7" data-target="page" data-page="7">7</a>
+    <a href="?&p=8" data-target="page" data-page="8">8</a>
+    <a href="?&p=9" data-target="page" data-page="9">9</a>
+    <a href="?&p=10" data-target="page" data-page="10">10</a>
+    <a href="?&p=2" class="page-navigation-next"  data-page="2" title="下一页">下一页»</a>
+</div><!-- #page-navigation -->
+<script type="text/x-handlebars-template" id="waterfall-tpl">
+{{#result}}
+    <div class="item">
+        <img src="{{image}}" width="{{width}}" height="{{height}}" />
+    </div>
+{{/result}}
+</script>
+<script src="js/libs/jquery/jquery.js"></script>
+<script src="js/libs/handlebars/handlebars.js"></script>
+<script src="../src/waterfall.js"></script>
+<script>
+$('#container').waterfall({
+    itemCls: 'item',
+    colWidth: 222,  
+    gutterWidth: 15,
+    gutterHeight: 15,
+    maxPage: 5,
+    checkImagesLoaded: false,
+    callbacks: {
+        
+        loadingFinished: function($loading, isBeyondMaxPage) {
+            if ( !isBeyondMaxPage ) {
+                $loading.fadeOut();
+            } else {
+                $loading.hide();
+                $('#page-navigation').show();
+            }
+        },
+        renderData: function (data, dataType) {
+            var tpl,
+                template,
+                resultNum = data.total;
+                
+            if ( resultNum < 20) {
+                $('#container').waterfall('pause', function() {
+                    alert('no more data');
+                });
+            }
+    
+            if ( dataType === 'json' ||  dataType === 'jsonp'  ) { // json or jsonp format
+                tpl = $('#waterfall-tpl').html();
+                template = Handlebars.compile(tpl);
+    
+                return template(data);
+            } else { // html format
+                return data;
+            }
+        }
+    },
+    path: function(page) {
+        return 'data/data' + page + '.json';
+    }
+});
+</script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-1245097-16']);
+_gaq.push(['_trackPageview']);
+_gaq.push(['_trackPageLoadTime']);
+(function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = 'https://ssl.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</body>
+</html>
