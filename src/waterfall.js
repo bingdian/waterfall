@@ -122,7 +122,7 @@
     
     
     Waterfall.prototype = {
-        constructor: 'Waterfall',
+        constructor: Waterfall,
         
         // Console log wrapper
         _debug: function () {
