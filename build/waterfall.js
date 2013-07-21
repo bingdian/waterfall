@@ -1,4 +1,4 @@
-/*! waterfall - v0.1.5 - 2013-07-08
+/*! waterfall - v0.1.6 - 2013-07-21
 * http://wlog.cn/waterfall/
 * Copyright (c) 2013 bingdian; Licensed MIT */
 /*global Handlebars: false, console: false */
@@ -118,7 +118,7 @@
     
     
     Waterfall.prototype = {
-        constructor: 'Waterfall',
+        constructor: Waterfall,
         
         // Console log wrapper
         _debug: function () {
