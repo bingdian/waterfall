@@ -343,31 +343,31 @@ callbacks:
 
 **prepend**
 
-    $('#container').waterfalll('prepend', $content, callback);
+    $('#container').waterfall('prepend', $content, callback);
     
 **append**
     
-    $('#container').waterfalll('append', $content, callback);
+    $('#container').waterfall('append', $content, callback);
     
 **removeItems**
     
-    $('#container').waterfalll('removeItems', $items, callback);
+    $('#container').waterfall('removeItems', $items, callback);
 
 **reLayout**
 
-    $('#container').waterfalll('reLayout', $content, callback);
+    $('#container').waterfall('reLayout', $content, callback);
 
 **pause**
 
-    $('#container').waterfalll('pause', callback);
+    $('#container').waterfall('pause', callback);
     
 **resume**
 
-    $('#container').waterfalll('resume', callback);
+    $('#container').waterfall('resume', callback);
 
 **option**
     
-    $('#container').waterfalll('option', options, callback);
+    $('#container').waterfall('option', options, callback);
     
 ## Demos
  
