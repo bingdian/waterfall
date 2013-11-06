@@ -26,6 +26,7 @@
             containerStyle: { // the waterfall container style
                 position: 'relative'
             },
+            templateId:null,
             resizable: true, // triggers layout when browser window is resized
             isFadeIn: false, // fadein effect on loading
             isAnimated: false, // triggers animate when browser window is resized
@@ -91,9 +92,9 @@
                         template;
                         
                     if ( dataType === 'json' ||  dataType === 'jsonp'  ) { // json or jsonp format
-                        tpl = $('#waterfall-tpl').html();
+                        //template id可以动态获取
+                        tpl = defaults.templateId !== null ? $('#'+ defaults.templateId).html() : $('#waterfall-tpl').html();
                         template = Handlebars.compile(tpl);
-                        
                         return template(data);
                     } else { // html format
                         return data;
