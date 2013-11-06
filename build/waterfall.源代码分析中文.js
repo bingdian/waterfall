@@ -3,14 +3,12 @@
 * Copyright (c) 2013 bingdian; Licensed MIT */
 /*global Handlebars: false, console: false */
 ;(function( $, window, document, undefined ) {
-    
     'use strict';
-    
     /*
-     * defaults
+     * 默认配置参数
      */
     var $window = $(window),
-        pluginName = 'waterfall',
+        pluginName = 'waterfall',  //插件名
         defaults = {
             itemCls: 'waterfall-item',  // the brick element class
             prefix: 'waterfall', // the waterfall elements prefix
@@ -26,7 +24,6 @@
             containerStyle: { // the waterfall container style
                 position: 'relative'
             },
-            templateId:null,
             resizable: true, // triggers layout when browser window is resized
             isFadeIn: false, // fadein effect on loading
             isAnimated: false, // triggers animate when browser window is resized
@@ -36,10 +33,9 @@
             checkImagesLoaded: true, // triggers layout when images loaded. Suggest false
             path: undefined, // Either parts of a URL as an array (e.g. ["/popular/page/", "/"] => "/popular/page/1/" or a function that takes in the page number and returns a URL(e.g. function(page) { return '/populr/page/' + page; } => "/popular/page/1/")
             dataType: 'json', // json, jsonp, html
-            params: {}, // params,{type: "popular", tags: "travel", format: "json"} => "type=popular&tags=travel&format=json"
-            
+            params: {}, //params,{type: "popular", tags: "travel", format: "json"} => "type=popular&tags=travel&format=json"
+            templateId:null,
             loadingMsg: '<div style="text-align:center;padding:10px 0; color:#999;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // loading html
-            
             state: {
                 isDuringAjax: false, 
                 isProcessingData: false, 
@@ -47,8 +43,7 @@
                 isPause: false,
                 curPage: 1 // cur page
             },
-
-            // callbacks
+            // callbacks object  函数可以覆盖。
             callbacks: {
                 /*
                  * loading start 
@@ -90,7 +85,6 @@
                 renderData: function (data, dataType) {
                     var tpl,
                         template;
-                        
                     if ( dataType === 'json' ||  dataType === 'jsonp'  ) { // json or jsonp format
                         //template id可以动态获取
                         tpl = defaults.templateId !== null ? $('#'+ defaults.templateId).html() : $('#waterfall-tpl').html();
@@ -101,32 +95,44 @@
                     }
                 }
             },
-            
-            debug: false // enable debug
+            debug: false // debug
         };
-    
+   
     /*
-     * Waterfall constructor
-     */
+    *   Waterfall主类
+    *   
+    *   此插件执行流程思路，实例缓存在$(this).data('plugin_' + pluginName)中。
+    *
+    *   执行初始化_init()函数，会执行的函数如下：
+    *       options  配置对象
+    *       _setColumns()  计算一行的个数
+    *       _initContainer() 总容器prefix
+    *       _resetColumnsHeightArray()  重置一列的高度
+    *       reLayout()  装载jquery dom 对象
+    *       layout()  重新计算
+    *       _prefill()  当前容器元素的高如果比window对象的高要小，执行_scroll()
+    *       _doResize()  绑定resize事件
+    *       _doScroll ()  绑定scroll事件
+    *
+    *   如果_scroll被执行，将执行_requestData()函数{ajax}  json html jsonp。调用_handleResponse()函数，开始渲染，并重新位置计算，
+    *   
+    *   如果触发resize事件，则执行layout()函数，重新计算。
+    *
+    */
     function Waterfall(element, options) {
-        this.$element = $(element);
-        this.options = $.extend(true, {}, defaults, options);
+        this.$element = $(element); //容器dom对象
+        this.options = $.extend(true, {}, defaults, options); //参数合并
         this.colHeightArray = []; // columns height array 
         this.styleQueue = []; 
-        
-        this._init();
-    }
-    
-    
+        this._init();  //调用初始化
+    } 
     Waterfall.prototype = {
         constructor: Waterfall,
-        
         // Console log wrapper
         _debug: function () {
             if ( true !== this.options.debug ) {
                 return;
             }
-
             if (typeof console !== 'undefined' && typeof console.log === 'function') {
                 // Modern browsers
                 // Single argument, which is a string
@@ -140,8 +146,6 @@
                 Function.prototype.call.call(console.log, console, Array.prototype.slice.call(arguments));
             }
         },
-        
-        
         /*
          * _init 
          * @callback {Object Function } and when instance is triggered again -> $element.waterfall()
@@ -149,18 +153,19 @@
         _init: function( callback ) {
             var options = this.options,
                 path = options.path;
-                
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray(); 
-            this.reLayout( callback );
-            
+            this.reLayout(callback);
+
+            // console.log(!path);
             if ( !path ) { 
                 this._debug('Invalid path');
                 return;
             }
             
             // auto prefill
+            console.log(options.isAutoPrefill);
             if ( options.isAutoPrefill ) {
                 this._prefill();
             }
@@ -208,7 +213,6 @@
                 maxCol = options.maxCol,
                 cols = Math.floor(containerWidth / (colWidth + gutterWidth)),
                 col = Math.max(cols, minCol );
-            
             /*if ( !maxCol ) {
                 return col;
             } else {
@@ -222,6 +226,7 @@
          * set columns
          */
         _setColumns: function() {
+            //一行的个数
             this.cols = this._getColumns();
         },
 
@@ -246,7 +251,6 @@
                 i;
             
             this.colHeightArray.length = cols;
-            
             for (i = 0; i < cols; i++) {
                 this.colHeightArray[i] = 0;
             }
@@ -256,6 +260,9 @@
          * layout
          */
         layout: function($content, callback) {
+
+            //如果resize事件触发，则重新计算
+
             var options = this.options,
             $items = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content),
                 styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css', 
@@ -313,8 +320,9 @@
          * relayout
          */
         reLayout: function( callback ) {
+            //出发resize事件时，所有内容的jquery dom 对象.
             var $content = this.$element.find('.' + this.options.itemCls);
-            
+            // console.log($content);
             this._resetColumnsHeightArray(); 
             this.layout($content , callback );
         },
@@ -434,27 +442,27 @@
          * request data
          */
         _requestData: function(callback) {
+            //请求。
             var self = this,
                 options = this.options,
                 maxPage = options.maxPage,
-                curPage = options.state.curPage++, // cur page
+                curPage = options.state.curPage++, // cur page 页数默认为1
                 path = options.path,
                 dataType = options.dataType,
                 params = options.params,
                 pageurl;
-
             if ( maxPage !== undefined && curPage > maxPage ){
                 options.state.isBeyondMaxPage = true;
                 options.callbacks.loadingFinished(this.$loading, options.state.isBeyondMaxPage);
                 return;
             }
             
-            // get ajax url
+            // get ajax url 如果path为函数，页数传递给用户代码。
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
             
             this._debug('heading into ajax', pageurl+$.param(params));
             
-            // loading start
+            // loading start  loading图标加载
             options.callbacks.loadingStart(this.$loading);
             
             // update state status
@@ -475,14 +483,13 @@
                 }
             });
         },
-        
-        
         /**
          * handle response
          * @param {Object} data
          * @param {Function} callback
          */
         _handleResponse: function(data, callback) {
+            //渲染，更新页面。
             var self = this,
                 options = this.options,
                 content = $.trim(options.callbacks.renderData(data, options.dataType)),
@@ -498,8 +505,6 @@
                     self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
                 });
             }
-            
-            
         },
         
         /*
@@ -532,6 +537,7 @@
          * prefill
          */
         _prefill: function() {
+            console.log(this.$element.height() <= $window.height());
             if ( this.$element.height() <= $window.height() ) {
                 this._scroll();
             }
@@ -587,8 +593,6 @@
         _resize: function() {
             var cols = this.cols,
                 newCols = this._getColumns(); // new columns
-            
-            
             if ( newCols !== cols || this.options.align !== 'left' ) {
                 //this._debug('event', 'resizing ...');
                 this.options.state.isResizing = true;
@@ -610,7 +614,6 @@
                 if ( resizeTimer ) {
                     clearTimeout(resizeTimer);
                 }
-                
                 resizeTimer = setTimeout(function() {
                     self._resize();
                 }, 100); 
@@ -646,7 +649,6 @@
                 }
             });
         }
-    
         return this;
     };
     
