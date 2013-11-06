@@ -2,12 +2,8 @@
 * http://wlog.cn/waterfall/
 * Copyright (c) 2013 bingdian; Licensed MIT */
 /*global Handlebars: false, console: false */
-
-//源代码分析汉化，wenren。
 ;(function( $, window, document, undefined ) {
-    
     'use strict';
-    
     /*
      * 默认配置参数
      */
@@ -101,17 +97,25 @@
             },
             debug: false // debug
         };
+   
     /*
     *   Waterfall主类
     *   
     *   此插件执行流程思路，实例缓存在$(this).data('plugin_' + pluginName)中。
     *
-    *   执行初始化_init()函数，装载option配置对象，并执行_setColumns()计算一行个数。执行_initContainer() 总容器prefix。执行_resetColumnsHeightArray()重置一列的高度，执行reLayout(callback)出发resize事件时，装载所有内容的jquery dom 对象，并调用layout()重新计算。
-    *        
-    *   元素瀑布数据获取_requestData{ajax or jsonp}执行_handleResponse渲染，位置计算。
+    *   执行初始化_init()函数，会执行的函数如下：
+    *       options  配置对象
+    *       _setColumns()  计算一行的个数
+    *       _initContainer() 总容器prefix
+    *       _resetColumnsHeightArray()  重置一列的高度
+    *       reLayout()  装载jquery dom 对象
+    *       layout()  重新计算
+    *       _prefill()  当前容器元素的高如果比window对象的高要小，执行_scroll()
+    *       _doResize()  绑定resize事件
+    *       _doScroll ()  绑定scroll事件
     *
-    *   resize事件绑定_doScroll()函数。
-    *
+    *   如果_scroll被执行，将执行_requestData()函数{ajax}  json html jsonp。调用_handleResponse()函数，开始渲染，并重新位置计算，
+    *   
     *   如果触发resize事件，则执行layout()函数，重新计算。
     *
     */
@@ -129,7 +133,6 @@
             if ( true !== this.options.debug ) {
                 return;
             }
-
             if (typeof console !== 'undefined' && typeof console.log === 'function') {
                 // Modern browsers
                 // Single argument, which is a string
@@ -150,7 +153,6 @@
         _init: function( callback ) {
             var options = this.options,
                 path = options.path;
-                
             this._setColumns();
             this._initContainer(); 
             this._resetColumnsHeightArray(); 
@@ -163,6 +165,7 @@
             }
             
             // auto prefill
+            console.log(options.isAutoPrefill);
             if ( options.isAutoPrefill ) {
                 this._prefill();
             }
@@ -534,6 +537,7 @@
          * prefill
          */
         _prefill: function() {
+            console.log(this.$element.height() <= $window.height());
             if ( this.$element.height() <= $window.height() ) {
                 this._scroll();
             }
