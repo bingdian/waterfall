@@ -7,9 +7,9 @@
  */
 /*global Handlebars: false, console: false */
 ;(function( $, window, document, undefined ) {
-    
+
     'use strict';
-    
+
     /*
      * defaults
      */
@@ -40,12 +40,12 @@
             path: undefined, // Either parts of a URL as an array (e.g. ["/popular/page/", "/"] => "/popular/page/1/" or a function that takes in the page number and returns a URL(e.g. function(page) { return '/populr/page/' + page; } => "/popular/page/1/")
             dataType: 'json', // json, jsonp, html
             params: {}, // params,{type: "popular", tags: "travel", format: "json"} => "type=popular&tags=travel&format=json"
-            
+
             loadingMsg: '<div style="text-align:center;padding:10px 0; color:#999;"><img src="data:image/gif;base64,R0lGODlhEAALAPQAAP///zMzM+Li4tra2u7u7jk5OTMzM1hYWJubm4CAgMjIyE9PT29vb6KiooODg8vLy1JSUjc3N3Jycuvr6+Dg4Pb29mBgYOPj4/X19cXFxbOzs9XV1fHx8TMzMzMzMzMzMyH5BAkLAAAAIf4aQ3JlYXRlZCB3aXRoIGFqYXhsb2FkLmluZm8AIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7" alt=""><br />Loading...</div>', // loading html
-            
+
             state: {
-                isDuringAjax: false, 
-                isProcessingData: false, 
+                isDuringAjax: false,
+                isProcessingData: false,
                 isResizing: false,
                 isPause: false,
                 curPage: 1 // cur page
@@ -54,14 +54,14 @@
             // callbacks
             callbacks: {
                 /*
-                 * loading start 
+                 * loading start
                  * @param {Object} loading $('#waterfall-loading')
                  */
                 loadingStart: function($loading) {
                     $loading.show();
                     //console.log('loading', 'start');
                 },
-                
+
                 /*
                  * loading finished
                  * @param {Object} loading $('#waterfall-loading')
@@ -76,7 +76,7 @@
                         $loading.remove();
                     }
                 },
-                
+
                 /*
                  * loading error
                  * @param {String} xhr , "end" "error"
@@ -84,7 +84,7 @@
                 loadingError: function($message, xhr) {
                     $message.html('Data load faild, please try again later.');
                 },
-                
+
                 /*
                  * render data
                  * @param {String} data
@@ -93,37 +93,37 @@
                 renderData: function (data, dataType) {
                     var tpl,
                         template;
-                        
+
                     if ( dataType === 'json' ||  dataType === 'jsonp'  ) { // json or jsonp format
                         tpl = $('#waterfall-tpl').html();
                         template = Handlebars.compile(tpl);
-                        
+
                         return template(data);
                     } else { // html format
                         return data;
                     }
                 }
             },
-            
+
             debug: false // enable debug
         };
-    
+
     /*
      * Waterfall constructor
      */
     function Waterfall(element, options) {
         this.$element = $(element);
         this.options = $.extend(true, {}, defaults, options);
-        this.colHeightArray = []; // columns height array 
-        this.styleQueue = []; 
-        
+        this.colHeightArray = []; // columns height array
+        this.styleQueue = [];
+
         this._init();
     }
-    
-    
+
+
     Waterfall.prototype = {
         constructor: Waterfall,
-        
+
         // Console log wrapper
         _debug: function () {
             if ( true !== this.options.debug ) {
@@ -143,60 +143,60 @@
                 Function.prototype.call.call(console.log, console, Array.prototype.slice.call(arguments));
             }
         },
-        
-        
+
+
         /*
-         * _init 
+         * _init
          * @callback {Object Function } and when instance is triggered again -> $element.waterfall()
          */
         _init: function( callback ) {
             var options = this.options,
                 path = options.path;
-                
+
             this._setColumns();
-            this._initContainer(); 
-            this._resetColumnsHeightArray(); 
+            this._initContainer();
+            this._resetColumnsHeightArray();
             this.reLayout( callback );
-            
-            if ( !path ) { 
+
+            if ( !path ) {
                 this._debug('Invalid path');
                 return;
             }
-            
+
             // auto prefill
             if ( options.isAutoPrefill ) {
                 this._prefill();
             }
-            
+
             // bind resize
             if ( options.resizable ) {
                 this._doResize();
             }
-            
+
             // bind scroll
             this._doScroll();
         },
-        
+
         /*
          * init waterfall container
          */
         _initContainer: function() {
             var options = this.options,
                 prefix = options.prefix;
-            
+
             // fix fixMarginLeft bug
             $('body').css({
                 overflow: 'scroll'
             });
-            
-            
+
+
             this.$element.css(this.options.containerStyle).addClass(prefix + '-container');
             this.$element.after('<div id="' + prefix + '-loading">' +options.loadingMsg+ '</div><div id="' + prefix + '-message" style="text-align:center;color:#999;"></div>');
-            
+
             this.$loading = $('#' + prefix + '-loading');
             this.$message = $('#' + prefix + '-message');
         },
-        
+
 
         /**
          * get columns
@@ -211,7 +211,7 @@
                 maxCol = options.maxCol,
                 cols = Math.floor(containerWidth / (colWidth + gutterWidth)),
                 col = Math.max(cols, minCol );
-            
+
             /*if ( !maxCol ) {
                 return col;
             } else {
@@ -219,8 +219,8 @@
             }*/
             return !maxCol ? col : (col > maxCol ? maxCol : col);
         },
-        
-        
+
+
         /**
          * set columns
          */
@@ -228,7 +228,7 @@
             this.cols = this._getColumns();
         },
 
-        
+
         /*
          * get items
          */
@@ -236,32 +236,32 @@
             var $items = $content.filter('.' + this.options.itemCls).css({
                 'position': 'absolute'
             });
-            
+
             return $items;
         },
-        
-        
+
+
         /*
          * reset columns height array
          */
         _resetColumnsHeightArray: function() {
             var cols = this.cols,
                 i;
-            
+
             this.colHeightArray.length = cols;
-            
+
             for (i = 0; i < cols; i++) {
                 this.colHeightArray[i] = 0;
             }
         },
-        
+
         /*
          * layout
          */
         layout: function($content, callback) {
             var options = this.options,
             $items = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content),
-                styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css', 
+                styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css',
                 animationOptions = options.animationOptions,
                 colWidth = options.colWidth,
                 gutterWidth = options.gutterWidth,
@@ -273,7 +273,7 @@
 
             // append $items
             this.$element.append($items);
-            
+
             // fixMarginLeft
             if ( align === 'center' ) {
                 fixMarginLeft = (this.$element.width() - colWidth * len  - gutterWidth * (len - 1) ) /2;
@@ -283,7 +283,7 @@
             } else if ( align === 'right' ) {
                 fixMarginLeft = this.$element.width() - colWidth * len  - gutterWidth * (len - 1);
             }
-            
+
             // place items
             for (i = 0, itemsLen = $items.length; i < itemsLen; i++) {
                 this._placeItems( $items[i], fixMarginLeft);
@@ -294,39 +294,39 @@
                 obj = this.styleQueue[j];
                 obj.$el[ styleFn ]( obj.style, animationOptions );
             }
-            
+
             // update waterfall container height
             this.$element.height(Math.max.apply({}, this.colHeightArray));
-            
+
             // clear style queue
             this.styleQueue = [];
-            
+
             // update status
             this.options.state.isResizing = false;
             this.options.state.isProcessingData = false;
-            
+
             // callback
             if ( callback ) {
                 callback.call( $items );
             }
         },
-        
-        
+
+
         /*
          * relayout
          */
         reLayout: function( callback ) {
             var $content = this.$element.find('.' + this.options.itemCls);
-            
-            this._resetColumnsHeightArray(); 
+
+            this._resetColumnsHeightArray();
             this.layout($content , callback );
         },
-        
+
         /*
          * place items
          */
         _placeItems: function( item, fixMarginLeft ) {
-           
+
             var $item = $(item),
                 options = this.options,
                 colWidth = options.colWidth,
@@ -334,11 +334,11 @@
                 gutterHeight = options.gutterHeight,
                 colHeightArray = this.colHeightArray,
                 len = colHeightArray.length,
-                minColHeight = Math.min.apply({}, colHeightArray), 
-                minColIndex = $.inArray(minColHeight, colHeightArray), 
+                minColHeight = Math.min.apply({}, colHeightArray),
+                minColIndex = $.inArray(minColHeight, colHeightArray),
                 colIndex, //cur column index
                 position;
-             
+
             if ( $item.hasClass(options.prefix + '-item-fixed-left')) {
                 colIndex = 0;
             } else if ( $item.hasClass(options.prefix + '-item-fixed-right') ) {
@@ -346,32 +346,32 @@
             } else {
                 colIndex = minColIndex;
             }
-            
+
             position = {
                 left: (colWidth + gutterWidth) * colIndex  + fixMarginLeft,
-                top: colHeightArray[colIndex] 
+                top: colHeightArray[colIndex]
             };
 
             // push to style queue
             this.styleQueue.push({ $el: $item, style: position });
-            
+
             // update column height
             colHeightArray[colIndex] += $item.outerHeight() + gutterHeight;
-            
+
             //item add attr data-col
             //$item.attr('data-col', colIndex);
         },
-        
+
         /*
          * prepend
          * @param {Object} $content
          * @param {Function} callback
          */
         prepend: function($content, callback) {
-            this.$element.prepend($content);  
-            this.reLayout(callback); 
+            this.$element.prepend($content);
+            this.reLayout(callback);
         },
-        
+
         /*
          * append
          * @param {Object} $content
@@ -379,9 +379,9 @@
          */
         append: function($content, callback) {
             this.$element.append($content);
-            this.layout($content, callback);
+            this.reLayout(callback);
         },
-        
+
         /*
          * remove item
          * @param {Object} $items
@@ -391,7 +391,7 @@
             this.$element.find($items).remove();
             this.reLayout(callback);
         },
-        
+
         /*
          * opts
          * @param {Object} opts
@@ -400,39 +400,39 @@
         option: function( opts, callback ){
             if ( $.isPlainObject( opts ) ){
                 this.options = $.extend(true, this.options, opts);
-                
+
                 if ( typeof callback === 'function' ) {
                     callback();
                 }
-                
+
                 // re init
                 this._init();
-            } 
+            }
         },
-        
+
         /*
          * prevent ajax request
          */
         pause: function(callback) {
             this.options.state.isPause = true;
-            
+
             if ( typeof callback === 'function' ) {
                 callback();
             }
         },
-        
+
 
         /*
          * resume ajax request
          */
         resume: function(callback) {
             this.options.state.isPause = false;
-            
+
             if ( typeof callback === 'function' ) {
                 callback();
             }
         },
-        
+
         /**
          * request data
          */
@@ -451,19 +451,19 @@
                 options.callbacks.loadingFinished(this.$loading, options.state.isBeyondMaxPage);
                 return;
             }
-            
+
             // get ajax url
             pageurl = (typeof path === 'function') ? path(curPage) : path.join(curPage);
-            
+
             this._debug('heading into ajax', pageurl+$.param(params));
-            
+
             // loading start
             options.callbacks.loadingStart(this.$loading);
-            
+
             // update state status
             options.state.isDuringAjax = true;
             options.state.isProcessingData = true;
-            
+
             // ajax
             $.ajax({
                 url: pageurl,
@@ -478,8 +478,8 @@
                 }
             });
         },
-        
-        
+
+
         /**
          * handle response
          * @param {Object} data
@@ -491,8 +491,8 @@
                 content = $.trim(options.callbacks.renderData(data, options.dataType)),
                 $content = $(content),
                 checkImagesLoaded = options.checkImagesLoaded;
-            
-            if ( !checkImagesLoaded ) { 
+
+            if ( !checkImagesLoaded ) {
                self.append($content, callback);
                self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
             } else {
@@ -501,36 +501,36 @@
                     self.options.callbacks.loadingFinished(self.$loading, self.options.state.isBeyondMaxPage);
                 });
             }
-            
-            
+
+
         },
-        
+
         /*
          * reponse error
          */
         _responeseError: function(xhr) {
-            
+
             this.$loading.hide();
             this.options.callbacks.loadingError(this.$message, xhr);
-            
+
             if ( xhr !== 'end' && xhr !== 'error' ) {
                 xhr = 'unknown';
             }
-            
+
             this._debug('Error', xhr);
         },
-        
-        
+
+
         _nearbottom: function() {
             var options = this.options,
                 minColHeight = Math.min.apply({}, this.colHeightArray),
-                distanceFromWindowBottomToMinColBottom = $window.scrollTop() + $window.height() - this.$element.offset().top - minColHeight; 
-                
+                distanceFromWindowBottomToMinColBottom = $window.scrollTop() + $window.height() - this.$element.offset().top - minColHeight;
+
             this._debug('math:', distanceFromWindowBottomToMinColBottom);
 
             return ( distanceFromWindowBottomToMinColBottom > options.bufferPixel );
         },
-        
+
         /*
          * prefill
          */
@@ -539,7 +539,7 @@
                 this._scroll();
             }
         },
-        
+
         /*
          * _scroll
          */
@@ -551,26 +551,26 @@
             if ( state.isProcessingData || state.isDuringAjax || state.isInvalidPage || state.isPause ) {
                 return;
             }
-            
+
             if ( !this._nearbottom() ) {
                 return;
             }
-            
+
             this._requestData(function() {
                 var timer = setTimeout(function() {
                     self._scroll();
                 }, 100);
             });
         },
-        
-        
+
+
         /*
          * do scroll
          */
         _doScroll: function() {
             var self = this,
                 scrollTimer;
-            
+
             $window.bind('scroll', function() {
                 if ( scrollTimer ) {
                     clearTimeout(scrollTimer);
@@ -582,16 +582,16 @@
                 }, 100);
             });
         },
-        
-        
+
+
         /*
          * resize
          */
         _resize: function() {
             var cols = this.cols,
                 newCols = this._getColumns(); // new columns
-            
-            
+
+
             if ( newCols !== cols || this.options.align !== 'left' ) {
                 //this._debug('event', 'resizing ...');
                 this.options.state.isResizing = true;
@@ -600,8 +600,8 @@
                 this._prefill(); // prefill
             }
         },
-        
-        
+
+
         /*
          * do resize
          */
@@ -613,22 +613,22 @@
                 if ( resizeTimer ) {
                     clearTimeout(resizeTimer);
                 }
-                
+
                 resizeTimer = setTimeout(function() {
                     self._resize();
-                }, 100); 
+                }, 100);
             });
         }
     };
-    
-    
+
+
     $.fn[pluginName] = function(options) {
         if ( typeof options === 'string' ) { // plugin method
             var args = Array.prototype.slice.call( arguments, 1 );
-            
+
             this.each(function() {
                 var instance = $.data( this, 'plugin_' + pluginName );
-                
+
                 if ( !instance ) {
                     instance._debug('instance is not initialization');
                     return;
@@ -638,7 +638,7 @@
                     instance._debug( 'no such method "' + options + '"' );
                     return;
                 }
-                
+
                 //  apply method
                 instance[options].apply( instance, args );
             });
@@ -649,10 +649,10 @@
                 }
             });
         }
-    
+
         return this;
     };
-    
+
 }( jQuery, window, document ));
 
 
