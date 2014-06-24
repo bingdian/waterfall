@@ -261,6 +261,7 @@ script:
         <td>{}</td>
         <td>瀑布流数据请求参数,{type: "popular", tags: "travel", format: "json"} => "type=popular&tags=travel&format=json"</td>
     </tr>
+    <tr>
         <td>headers</td>
         <td>Object</td>
         <td>{}</td>
