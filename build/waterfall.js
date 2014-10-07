@@ -257,7 +257,7 @@
          */
         layout: function($content, callback) {
             var options = this.options,
-            $items = this.options.isFadeIn ? this._getItems($content).css({ opacity: 0 }).animate({ opacity: 1 }) : this._getItems($content),
+            $items = this.options.isFadeIn ? this._getItems($content).animate({ opacity: 1 }) : this._getItems($content),
                 styleFn = (this.options.isAnimated && this.options.state.isResizing) ? 'animate' : 'css',
                 animationOptions = options.animationOptions,
                 colWidth = options.colWidth,
