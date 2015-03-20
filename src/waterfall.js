@@ -473,6 +473,9 @@
                 headers: headers,
                 dataType: dataType,
                 success: function(data) {
+                    if (data.total == 0 || JSON.stringify(data) == "{}"){
+                        maxPage = curPage;
+                    }
                     self._handleResponse(data, callback);
                     self.options.state.isDuringAjax = false;
                 },
