@@ -187,7 +187,7 @@
 
             // fix fixMarginLeft bug
             $('body').css({
-                overflow: 'scroll'
+                overflow: 'auto'
             });
 
 
