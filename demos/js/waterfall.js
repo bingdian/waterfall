@@ -1,6 +1,6 @@
-/*! waterfall - v0.1.72 - 2014-06-24
+/*! waterfall - v0.1.73 - 2015-12-01
 * http://wlog.cn/waterfall/
-* Copyright (c) 2014 bingdian; Licensed MIT */
+* Copyright (c) 2015 bingdian; Licensed MIT */
 /*global Handlebars: false, console: false */
 ;(function( $, window, document, undefined ) {
 
@@ -183,7 +183,7 @@
 
             // fix fixMarginLeft bug
             $('body').css({
-                overflow: 'scroll'
+                overflow: 'auto'
             });
 
 
