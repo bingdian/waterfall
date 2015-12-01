@@ -364,32 +364,80 @@
         },
 
         /*
+         * @senntyou 添加支持json数据
+         *
          * prepend
          * @param {Object} $content
+         * @param type string 'html', 'json'
          * @param {Function} callback
          */
-        prepend: function($content, callback) {
-            this.$element.prepend($content);
-            this.reLayout(callback);
+        prepend: function($content, type, callback) {
+            var type = type || 'html',
+                self = this,
+                options = self.options,
+                content;
+
+            if (type === 'json') {
+                content = $.trim(options.callbacks.renderData($content, options.dataType));
+                $content = $(content);
+            }
+            self.$element.prepend($content);
+            self.reLayout(callback);
         },
 
         /*
+         * @senntyou 添加支持json数据
+         *
          * append
          * @param {Object} $content
+         * @param type string 'html', 'json'
          * @param {Function} callback
          */
-        append: function($content, callback) {
-            this.$element.append($content);
-            this.reLayout(callback);
+        append: function($content, type, callback) {
+            var type = type || 'html',
+                self = this,
+                options = self.options,
+                content;
+
+            if (type === 'json') {
+                content = $.trim(options.callbacks.renderData($content, options.dataType));
+                $content = $(content);
+            }
+            self.$element.append($content);
+            self.reLayout(callback);
         },
 
         /*
+         * @senntyou 添加支持index数据
+         *
          * remove item
          * @param {Object} $items
          * @param {Function} callback
          */
-        removeItems:function($items, callback ) {
-            this.$element.find($items).remove();
+        removeItems:function(index, callback ) {
+            var i, len,
+                self = this;
+            if (typeof(index) === 'number') {
+                self.$element.find('.' + this.options.itemCls).eq(index).remove();
+            } else if ($.isArray(index)) {
+                index = index.sort(function (param1, param2) {
+                   var first = parseInt(param1);
+                   var second = parseInt(param2);
+                   
+                   if (first == second)
+                      return 0;
+                   if (first < second)
+                      return -1;
+                   else
+                      return 1; 
+                });
+                for (i = 0, len = index.length; i < len; i++) {
+                    self.$element.find('.' + this.options.itemCls).eq(index[i]-i).remove();
+                }
+            }
+            else {            
+                this.$element.find(index).remove();
+            }
             this.reLayout(callback);
         },
 
